@@ -91,7 +91,8 @@ async def judge(question: str, reference: str, contexts: list[str], answer: str)
                     reference=reference or "(sin referencia)",
                     contexts="\n---\n".join(contexts)[:12000] or "(ninguno)",
                     answer=answer,
-                ),
+                )
+                + llm.json_instruction(Verdict),
             }
         ],
         output_format=Verdict,

@@ -1,4 +1,6 @@
 """Single place that owns the Anthropic client. Tests inject a fake with `set_client`."""
+import json
+
 import anthropic
 
 from . import config
@@ -24,6 +26,14 @@ def client():
             )
         _client = anthropic.AsyncAnthropic()
     return _client
+
+
+def json_instruction(schema) -> str:
+    # Ollama's Anthropic endpoint ignores output_format, so the prompt also carries the schema.
+    return (
+        "\n\nResponde únicamente con un objeto JSON, sin Markdown, que cumpla este JSON Schema:\n"
+        + json.dumps(schema.model_json_schema(), ensure_ascii=False)
+    )
 
 
 def describe_error(exc: Exception) -> str:

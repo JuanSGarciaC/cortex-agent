@@ -38,6 +38,10 @@ flowchart LR
 
 También están el **Chat**, con una traza en vivo al lado de la respuesta, y **Trazas**, que muestra cada run como grafo (React Flow) y como cascada de tiempos, junto con el razonamiento resumido del modelo.
 
+| | |
+|---|---|
+| ![Chat](docs/img/chat.png) **Chat** | ![Trazas](docs/img/trazas.png) **Trazas** |
+
 ## Cómo correrlo
 
 Requisitos: Python 3.12 y Node 20 o superior.
@@ -58,6 +62,19 @@ ANTHROPIC_API_KEY=sk-ant-...
 ```
 
 Sin key funcionan el RAG, el mapa, la memoria, el catálogo MCP y los evals de retrieval.
+
+### Sin costo: modelo local con Ollama
+
+Instala [Ollama](https://ollama.com), corre `ollama pull qwen3:8b` y usa este `backend/.env`:
+
+```
+ANTHROPIC_BASE_URL=http://localhost:11434
+ANTHROPIC_AUTH_TOKEN=ollama
+AGENT_MODEL=qwen3:8b
+SMALL_MODEL=qwen3:8b
+```
+
+No tiene límite de peticiones, pero en CPU es lento y usa las herramientas de forma irregular. Resultados en [`docs/evidencias`](docs/evidencias/README.md).
 
 ### Variables opcionales (`backend/.env`)
 

@@ -1,0 +1,17 @@
+PASS  a01      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 241099, "run_id": 4, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta utiliza correctamente el fragmento 7 para calcular los días de vacaciones (15 + 2 = 17) y coincide exactamente con la respuesta de referencia."}
+FAIL  a02      {"error": "ValidationError: 1 validation error for Verdict\n  Invalid JSON: trailing characters at line 1 column 207 [type=json_invalid, input_value='{\"faithfulness\":5,\"relev...gmento [chunk_id:5].\"}`', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/json_invalid"}
+PASS  a03      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 123175, "run_id": 6, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta cita correctamente el fragmento 14 y proporciona el número de contacto para P1 fuera de horario, coincidiendo exactamente con la respuesta de referencia."}
+FAIL  a04      {"tool_ok": 0.0, "steps": 2, "cost_usd": 0.0, "ms": 134761, "run_id": 7, "recall": 0.0, "mrr": 0.0, "faithfulness": 5, "relevance": 2, "reason": "La respuesta es fiel al no inventar información, pero no responde la pregunta ni coincide con la referencia debido a la falta de fragmentos recuperados."}
+FAIL  a05      {"tool_ok": 0.0, "steps": 1, "cost_usd": 0.0, "ms": 76345, "run_id": 8, "faithfulness": 5, "relevance": 5, "reason": "La respuesta reconoce que no hay documentos disponibles y responde directamente a la pregunta, alineándose con la respuesta de referencia."}
+FAIL  a06      {"tool_ok": 1.0, "steps": 1, "cost_usd": 0.0, "ms": 50462, "run_id": 9, "faithfulness": 1, "relevance": 5, "reason": "La respuesta es correcta y coincide con la referencia, pero no se apoya en fragmentos recuperados."}
+{
+  "cases": 6,
+  "pass_rate": 0.3333,
+  "avg_tool_ok": 0.6,
+  "avg_recall": 0.6667,
+  "avg_faithfulness": 4.2,
+  "avg_relevance": 4.4,
+  "avg_steps": 1.6,
+  "avg_cost_usd": 0.0,
+  "avg_ms": 125168.4
+}
