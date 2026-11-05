@@ -1,0 +1,12 @@
+{
+  "name": "Agente con RAG (respuestas juzgadas)",
+  "kind": "agent",
+  "cases": [
+    {"id": "a01", "question": "¿Cuántos días de vacaciones tengo si llevo 7 años en la empresa?", "expected_tool": "rag_search", "expected_docs": ["politica-vacaciones"], "reference": "15 días base más 1 por año después del quinto: 17 días hábiles (tope 20)."},
+    {"id": "a02", "question": "Voy a Cali dos días, ¿cuánto me reconocen de alimentación en total?", "expected_tool": "rag_search", "expected_docs": ["politica-gastos"], "reference": "120.000 COP por día en Cali, 240.000 COP por los dos días."},
+    {"id": "a03", "question": "Se cayó el sistema de despachos un domingo, ¿a quién llamo?", "expected_tool": "rag_search", "expected_docs": ["soporte-ti"], "reference": "Es P1 fuera de horario: línea de guardia 601 555 0199."},
+    {"id": "a04", "question": "¿Desde cuándo tengo medicina prepagada?", "expected_tool": "rag_search", "expected_docs": ["onboarding"], "reference": "Después del periodo de prueba (2 meses en contrato indefinido); la empresa paga el 50 %."},
+    {"id": "a05", "question": "¿Cuál es la política de teletrabajo internacional?", "expected_tool": "rag_search", "expected_docs": [], "reference": "Los documentos no tratan ese tema; el asistente debe decir que no lo encuentra."},
+    {"id": "a06", "question": "¿Cuánto es 17 por 23?", "expected_tool": null, "expected_docs": [], "reference": "391, sin usar herramientas."}
+  ]
+}

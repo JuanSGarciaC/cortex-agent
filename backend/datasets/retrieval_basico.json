@@ -1,0 +1,18 @@
+{
+  "name": "Retrieval básico (manual de Andes Logística)",
+  "kind": "retrieval",
+  "cases": [
+    {"id": "r01", "question": "¿Cuántos días de vacaciones tengo por año?", "expected_docs": ["politica-vacaciones"]},
+    {"id": "r02", "question": "¿Con cuánta anticipación pido vacaciones?", "expected_docs": ["politica-vacaciones"]},
+    {"id": "r03", "question": "¿Cuál es el tope de hospedaje por noche en un viaje?", "expected_docs": ["politica-gastos"]},
+    {"id": "r04", "question": "¿Me reembolsan el minibar del hotel?", "expected_docs": ["politica-gastos"]},
+    {"id": "r05", "question": "¿En cuánto tiempo responden un caso P1?", "expected_docs": ["soporte-ti"]},
+    {"id": "r06", "question": "¿Cada cuánto vence la contraseña?", "expected_docs": ["soporte-ti"]},
+    {"id": "r07", "question": "¿Qué pasa en la primera semana de ingreso?", "expected_docs": ["onboarding"]},
+    {"id": "r08", "question": "¿Cuánto es el auxilio de conectividad para trabajo híbrido?", "expected_docs": ["onboarding"]},
+    {"id": "r09", "question": "¿Puedo usar una memoria USB en el portátil?", "expected_docs": ["seguridad-informacion"]},
+    {"id": "r10", "question": "¿Cómo reporto un correo de phishing?", "expected_docs": ["seguridad-informacion"]},
+    {"id": "r11", "question": "Perdí mi portátil, ¿qué hago?", "expected_docs": ["soporte-ti"]},
+    {"id": "r12", "question": "¿Puedo pegar datos de clientes en un chatbot de IA?", "expected_docs": ["seguridad-informacion"]}
+  ]
+}

@@ -1,0 +1,10 @@
+anthropic[mcp]>=2.5
+mcp>=2.3
+fastapi
+uvicorn[standard]
+python-multipart
+fastembed
+numpy
+pypdf
+pytest
+httpx
