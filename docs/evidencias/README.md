@@ -37,3 +37,7 @@ La API no era el cuello de botella: sus endpoints responden en 10 ms o menos. El
 - `eval-agente-qwen3-4b-1.txt` y `-2.txt`: corridas finales
 - `latencia-chat.txt`: última medición por la interfaz, con preguntas seguidas
 - `evals-agente.png`, `../img/chat.png`, `../img/trazas.png`, `../img/inicio.png`
+
+## Fallo de calidad detectado
+
+En la última medición por la interfaz, el chat respondió 20 días a la pregunta de vacaciones, cuando lo correcto es 17, y no citó el fragmento. Encontró el documento correcto, pero tomó el tope de la política como resultado. El 6 de 6 del eval no garantiza respuestas correctas siempre: `qwen3:4b` sirve para demostrar la app, no como modelo fiable.

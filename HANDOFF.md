@@ -36,4 +36,4 @@ Una sola app que reúne un harness de agente propio, MCP, RAG, memoria y evals, 
 - La búsqueda vectorial es por fuerza bruta en numpy y el mapa usa PCA en lugar de UMAP. Los límites están anotados con comentarios `shortcut:`.
 - Con `qwen3:4b`, `thinking: disabled` no funciona: el modelo razona igual y lo mezcla con la respuesta. Por eso sigue activo.
 - En el chat, la memoria se extrae en segundo plano después de `run_end`. El evento `memory_write` aparece en Trazas, no en la traza en vivo.
-- Para bajar de verdad la latencia hace falta un modelo más potente o la API de Claude; la app no es el cuello de botella.
+- Para bajar de verdad la latencia y responder con fiabilidad hace falta un modelo más potente o la API de Claude: `qwen3:4b` llegó a responder 20 días en lugar de 17 en el chat.
