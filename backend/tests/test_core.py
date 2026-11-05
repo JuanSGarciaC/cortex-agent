@@ -7,7 +7,7 @@ from app import db, evals, llm, memory, rag
 from app.harness import run_agent
 from app.main import app
 from app.tools import ToolHub
-from tests.conftest import FakeClient, Response, final, tool_use
+from tests.conftest import FakeClient, Parsed, Response, final, tool_use
 
 
 # ---------- RAG ----------
@@ -82,7 +82,8 @@ def test_harness_tool_loop_traces_and_persists(seeded):
     with db.session() as conn:
         types = [r[0] for r in conn.execute("SELECT type FROM events WHERE run_id=? ORDER BY seq", (result["run_id"],))]
         roles = [r[0] for r in conn.execute("SELECT role FROM messages ORDER BY id")]
-    assert types[0] == "run_start" and types[-1] == "run_end"
+    assert types[0] == "run_start"
+    assert types.index("answer") < types.index("run_end") < types.index("memory_write")  # memory never delays the run
     for t in ("memory_recall", "llm_call", "thinking", "tool_call", "tool_result", "answer", "memory_write"):
         assert t in types
     assert roles == ["user", "assistant", "user", "assistant"]
@@ -152,6 +153,80 @@ def test_agent_dataset_with_judge(seeded, monkeypatch):
     assert by_id["a06"]["scores"]["tool_ok"] == 1.0
     assert by_id["a01"]["passed"]
     assert report["summary"]["avg_faithfulness"] == 5
+
+
+def test_live_chat_ends_before_memory_extraction_finishes(seeded):
+    from app import harness
+
+    llm.set_client(FakeClient([final("Hola.")], facts=[memory.Fact(content="Prefiere viñetas", kind="preferencia")]))
+
+    async def go():
+        queue = asyncio.Queue()
+        await run_agent("Prefiero viñetas", queue=queue)
+        types = [queue.get_nowait()["type"] for _ in range(queue.qsize())]
+        assert types[-1] == "run_end" and "memory_write" not in types
+        await asyncio.gather(*harness._background)
+        assert queue.get_nowait()["type"] == "memory_write"
+
+    asyncio.run(go())
+    assert any(m["content"] == "Prefiere viñetas" for m in memory.list_all())
+
+
+def test_structured_recovers_json_wrapped_in_stray_text():
+    class Messages:
+        async def parse(self, **kwargs):
+            obj = '{"faithfulness": 4, "relevance": 5, "reason": "ok"}'
+            return kwargs["output_format"].model_validate_json(f"Veredicto: {obj}\n\n{obj}`")
+
+    class Client:
+        messages = Messages()
+
+    llm.set_client(Client())
+    assert asyncio.run(evals.judge("q", "r", ["c"], "a")) == {"faithfulness": 4, "relevance": 5, "reason": "ok"}
+
+
+def test_structured_retries_once_on_broken_json_then_gives_up():
+    import pytest
+
+    good = '{"faithfulness": 3, "relevance": 3, "reason": "ok"}'
+
+    class Messages:
+        def __init__(self, replies):
+            self.replies, self.calls = replies, 0
+
+        async def parse(self, **kwargs):
+            self.calls += 1
+            return Parsed(kwargs["output_format"].model_validate_json(self.replies.pop(0)))
+
+    class Client:
+        def __init__(self, replies):
+            self.messages = Messages(replies)
+
+    retry = Client(["sin json", good])
+    llm.set_client(retry)
+    assert asyncio.run(evals.judge("q", "r", ["c"], "a"))["faithfulness"] == 3
+    assert retry.messages.calls == 2
+
+    broken = Client(['{"faithfulness": 3, "rel', "tampoco"])
+    llm.set_client(broken)
+    with pytest.raises(RuntimeError):
+        asyncio.run(evals.judge("q", "r", ["c"], "a"))
+    assert broken.messages.calls == 2
+
+
+def test_agent_eval_keeps_answer_when_judge_fails(seeded, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test")
+
+    async def broken_judge(*_):
+        raise RuntimeError("sin veredicto")
+
+    monkeypatch.setattr(evals, "judge", broken_judge)
+    llm.set_client(FakeClient([final("Respuesta del agente.")] * 6))
+    report = asyncio.run(evals.run_dataset("agente_rag.json"))
+    a06 = next(r for r in report["results"] if r["case_id"] == "a06")
+    assert a06["output"] == "Respuesta del agente."
+    assert not a06["passed"]
+    assert "Juez" in a06["scores"]["error"]
 
 
 def test_dataset_path_traversal_rejected():

@@ -68,7 +68,6 @@ export default function MemoryPage() {
     <div className="page">
       <div className="page-head">
         <div>
-          <span className="eyebrow">Estado</span>
           <h1>Memoria</h1>
           <p>Hechos de largo plazo que el agente extrae al final de cada turno o guarda con la herramienta memory_save. Las líneas unen hechos con significado parecido.</p>
         </div>

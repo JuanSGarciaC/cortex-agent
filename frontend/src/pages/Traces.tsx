@@ -20,7 +20,10 @@ function StepNode({ data }: NodeProps<Node<StepData>>) {
 }
 const nodeTypes = { step: StepNode };
 
-/** Lay events out as columns: one column per step, parallel tool calls stacked inside it. */
+// Wrapping keeps fitView near 100 % zoom: one long row shrank the nodes until they were unreadable.
+const COLS_PER_ROW = 4;
+
+/** Lay events out as wrapped columns: one column per step, parallel tool calls stacked inside it. */
 function buildGraph(events: TraceEvent[], selected: number | null) {
   const nodes: Node<StepData>[] = [];
   const edges: Edge[] = [];
@@ -40,7 +43,7 @@ function buildGraph(events: TraceEvent[], selected: number | null) {
           : e.type === 'memory_write' ? d.kind
           : e.type === 'error' ? d.where : e.type === 'answer' ? d.status : d.model ?? '';
       nodes.push({
-        id: `n${e.seq}`, type: 'step', position: { x: col * 230, y: (i - (group.length - 1) / 2) * 90 + 120 },
+        id: `n${e.seq}`, type: 'step', position: { x: (col % COLS_PER_ROW) * 230, y: Math.floor(col / COLS_PER_ROW) * 170 + (i - (group.length - 1) / 2) * 70 },
         data: { title: e.type === 'tool_call' ? d.name : e.type === 'llm_call' ? `Modelo · paso ${d.step}` : EVENT_META[e.type]?.label ?? e.type, sub, type: e.type, event: res ?? e, err: e.type === 'error' || !!res?.data.is_error, selected: selected === e.seq },
       });
     });
@@ -109,7 +112,6 @@ export default function Traces() {
     <div className="page">
       <div className="page-head">
         <div>
-          <span className="eyebrow">Observabilidad</span>
           <h1>Trazas</h1>
           <p>Cada run del harness como grafo: el modelo, las herramientas MCP que llamó en paralelo, la memoria y el costo de cada paso.</p>
         </div>

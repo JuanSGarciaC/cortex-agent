@@ -65,16 +65,16 @@ Sin key funcionan el RAG, el mapa, la memoria, el catálogo MCP y los evals de r
 
 ### Sin costo: modelo local con Ollama
 
-Instala [Ollama](https://ollama.com), corre `ollama pull qwen3:8b` y usa este `backend/.env`:
+Instala [Ollama](https://ollama.com), corre `ollama pull qwen3:4b` y usa este `backend/.env`:
 
 ```
 ANTHROPIC_BASE_URL=http://localhost:11434
 ANTHROPIC_AUTH_TOKEN=ollama
-AGENT_MODEL=qwen3:8b
-SMALL_MODEL=qwen3:8b
+AGENT_MODEL=qwen3:4b
+SMALL_MODEL=qwen3:4b
 ```
 
-No tiene límite de peticiones, pero en CPU es lento y usa las herramientas de forma irregular. Resultados en [`docs/evidencias`](docs/evidencias/README.md).
+No tiene límite de peticiones, pero una respuesta puede tardar de 30 s a 3 min según la GPU y lo que razone el modelo. Resultados en [`docs/evidencias`](docs/evidencias/README.md).
 
 ### Variables opcionales (`backend/.env`)
 
@@ -120,7 +120,7 @@ El comando sale con código 1 si la tasa de aprobados queda bajo `--min-pass`. E
 cd backend && python -m pytest -q
 ```
 
-Son 15 tests. Usan un cliente LLM falso con respuestas guionadas y embeddings deterministas, así que no gastan API ni descargan modelos. Cubren el bucle del harness (herramientas, límite de pasos, rechazo, falta de credenciales), MCP en proceso, la búsqueda híbrida, la memoria, los evals (incluido el juez) y la API con SSE.
+Son 19 tests. Usan un cliente LLM falso con respuestas guionadas y embeddings deterministas, así que no gastan API ni descargan modelos. Cubren el bucle del harness (herramientas, límite de pasos, rechazo, falta de credenciales), MCP en proceso, la búsqueda híbrida, la memoria, los evals (incluido el juez) y la API con SSE.
 
 ## Decisiones y límites conocidos
 

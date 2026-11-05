@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from . import config, db, evals, llm, memory, rag
+from . import config, db, embed, evals, llm, memory, rag
 from .harness import run_agent
 from .tools import ToolHub
 
@@ -16,7 +16,10 @@ from .tools import ToolHub
 @asynccontextmanager
 async def lifespan(_app):
     db.init()
+    # Load the embedding model in the background so the first chat does not pay for it.
+    warmup = asyncio.create_task(asyncio.to_thread(embed.embed, ["calentamiento"]))
     yield
+    warmup.cancel()
 
 
 app = FastAPI(title="Cortex Agent", lifespan=lifespan)

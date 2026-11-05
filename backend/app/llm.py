@@ -2,6 +2,7 @@
 import json
 
 import anthropic
+import pydantic
 
 from . import config
 
@@ -28,12 +29,40 @@ def client():
     return _client
 
 
-def json_instruction(schema) -> str:
+async def structured(schema, prompt: str, max_tokens: int = 2000):
+    """Small-model call returning a `schema` instance, or None if two attempts yield nothing usable."""
     # Ollama's Anthropic endpoint ignores output_format, so the prompt also carries the schema.
-    return (
-        "\n\nResponde únicamente con un objeto JSON, sin Markdown, que cumpla este JSON Schema:\n"
+    instruction = (
+        "\n\nResponde únicamente con un objeto JSON con los valores, sin Markdown y sin repetir el esquema. JSON Schema:\n"
         + json.dumps(schema.model_json_schema(), ensure_ascii=False)
     )
+    for _ in range(2):  # small local models sometimes emit broken JSON or none at all; a second sample usually fixes it
+        try:
+            response = await client().messages.parse(
+                model=config.SMALL_MODEL,
+                max_tokens=max_tokens,
+                output_config={"effort": "low"},
+                messages=[{"role": "user", "content": prompt + instruction}],
+                output_format=schema,
+            )
+            if response.parsed_output is not None:
+                return response.parsed_output
+        except pydantic.ValidationError as exc:
+            recovered = _first_json_object(schema, str(exc.errors()[0].get("input", "")))
+            if recovered is not None:
+                return recovered
+    return None
+
+
+def _first_json_object(schema, text: str):
+    """Without native structured output, a model can surround valid JSON with stray text or repeat it."""
+    start = text.find("{")
+    if start < 0:
+        return None
+    try:
+        return schema.model_validate(json.JSONDecoder().raw_decode(text, start)[0])
+    except ValueError:  # JSONDecodeError and pydantic.ValidationError
+        return None
 
 
 def describe_error(exc: Exception) -> str:

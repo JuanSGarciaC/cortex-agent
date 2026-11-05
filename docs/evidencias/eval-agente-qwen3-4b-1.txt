@@ -1,0 +1,17 @@
+FAIL  a01      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 140643, "run_id": 57, "recall": 1.0, "mrr": 1.0, "error": "Juez: RuntimeError: El juez no devolvió un veredicto válido"}
+PASS  a02      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 18558, "run_id": 58, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta se basa en el fragmento recuperado chunk_id 5 que indica 120.000 COP por día en ciudades principales como Cali, calculando correctamente 240.000 COP para dos días y coincide con la referencia"}
+PASS  a03      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 24425, "run_id": 59, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta identifica correctamente la línea de guardia 601 555 0199 para casos P1 fuera de horario (chunk_id:14) y menciona el portal Ayuda como alternativa (chunk_id:13), coincidiendo con la referencia."}
+PASS  a04      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 26074, "run_id": 60, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta menciona que la medicina prepagada está disponible después del periodo de prueba según el contrato de onboarding (chunk_id:3), coincidiendo con la referencia y no inventa información"}
+PASS  a05      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 24705, "run_id": 61, "faithfulness": 5, "relevance": 5, "reason": "La respuesta indica correctamente que no se encuentran documentos relevantes para la política de teletrabajo internacional, alineándose con la referencia que los documentos no tratan el tema."}
+PASS  a06      {"tool_ok": 1.0, "steps": 1, "cost_usd": 0.0, "ms": 8921, "run_id": 62, "faithfulness": 5, "relevance": 5, "reason": "La pregunta es un cálculo simple y la respuesta es correcta, por lo que la ausencia de fragmentos no se penaliza"}
+{
+  "cases": 6,
+  "pass_rate": 0.8333,
+  "avg_tool_ok": 1.0,
+  "avg_recall": 1.0,
+  "avg_faithfulness": 5.0,
+  "avg_relevance": 5.0,
+  "avg_steps": 1.8333,
+  "avg_cost_usd": 0.0,
+  "avg_ms": 40554.3333
+}

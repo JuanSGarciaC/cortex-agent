@@ -16,10 +16,12 @@ SYSTEM = (
     "usa rag_search antes de responder, sin contestar de memoria, y cita los fragmentos que uses como [chunk_id].\n"
     "- Si la búsqueda no trae nada útil, dilo en lugar de inventar.\n"
     "- Usa memory_save solo cuando el usuario pida recordar algo.\n"
+    "- La memoria relevante ya llega en <memoria_del_usuario>: no llames memory_recall salvo que el usuario lo pida.\n"
     "- Responde en español, breve y directo, en Markdown."
 )
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 TOOL_OUTPUT_PREVIEW = 2000
+_background: set[asyncio.Task] = set()  # strong refs: the loop only keeps weak ones
 
 
 class Tracer:
@@ -192,15 +194,6 @@ async def run_agent(
             new_messages.append({"role": "assistant", "content": [{"type": "text", "text": answer}]})
         _persist(conv_id, new_messages)
         tracer.emit("answer", text=answer, status=status)
-
-        if extract_memory and status == "ok":
-            try:
-                for fact in await memory.extract(message, answer):
-                    saved = memory.save(fact.content, fact.kind, run_id)
-                    if not saved["duplicate"]:
-                        tracer.emit("memory_write", id=saved["id"], content=saved["content"], kind=saved["kind"])
-            except Exception as exc:  # memory is best-effort; the answer is already saved
-                tracer.emit("error", where="memory_extract", message=llm.describe_error(exc))
     except Exception as exc:
         status = "error"
         answer = llm.describe_error(exc)
@@ -213,6 +206,14 @@ async def run_agent(
             (status, totals["steps"], totals["input_tokens"], totals["output_tokens"], totals["cost_usd"], db.now(), run_id),
         )
     tracer.emit("run_end", status=status, ms=ms, **{k: round(v, 6) if isinstance(v, float) else v for k, v in totals.items()})
+    if extract_memory and status == "ok":
+        job = _remember(tracer, message, answer, run_id)
+        if queue is None:
+            await job
+        else:  # a live chat must not wait for this: the answer is already out
+            task = asyncio.create_task(job)
+            _background.add(task)
+            task.add_done_callback(_background.discard)
     return {
         "run_id": run_id,
         "conversation_id": conv_id,
@@ -224,6 +225,16 @@ async def run_agent(
         "ms": ms,
         **totals,
     }
+
+
+async def _remember(tracer: Tracer, message: str, answer: str, run_id: int) -> None:
+    try:
+        for fact in await memory.extract(message, answer):
+            saved = memory.save(fact.content, fact.kind, run_id)
+            if not saved["duplicate"]:
+                tracer.emit("memory_write", id=saved["id"], content=saved["content"], kind=saved["kind"])
+    except Exception as exc:  # memory is best-effort; the answer is already saved
+        tracer.emit("error", where="memory_extract", message=llm.describe_error(exc))
 
 
 async def _run_tool(hub: ToolHub, tracer: Tracer, step: int, call: dict) -> tuple[str, bool]:

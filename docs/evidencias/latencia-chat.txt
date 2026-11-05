@@ -1,0 +1,11 @@
+¿Cuántos días de vacaciones tengo  | respuesta 177.2s | fin 177.2s | chips 0
+Voy a Cali dos días, ¿cuánto me re | respuesta 62.2s | fin 62.2s | chips 2
+Se cayó el sistema de despachos un | respuesta 142.5s | fin 142.5s | chips 1
+m / overflowX 0
+m /chat overflowX 0
+m /trazas overflowX 0
+m /rag overflowX 0
+m /memoria overflowX 0
+m /evals overflowX 0
+m /herramientas overflowX 0
+errores consola 0 []

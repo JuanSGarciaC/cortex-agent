@@ -13,8 +13,8 @@ const SUGGESTIONS = [
   'Recuerda que prefiero respuestas en viñetas',
 ];
 
-// [12] in an answer is a chunk citation: render it as a chip.
-const withCitations = (text: string) => text.replace(/\[(\d{1,6})\]/g, '[$1](#chunk-$1)');
+// [12] or [chunk_id:12] in an answer is a chunk citation: render it as a chip.
+const withCitations = (text: string) => text.replace(/\[(?:chunk_id[:=\s]*)?(\d{1,6})\]/g, '[$1](#chunk-$1)');
 
 function Answer({ text }: { text: string }) {
   return (
@@ -130,7 +130,7 @@ export default function Chat() {
             <div className="empty" style={{ marginTop: '12vh' }}>
               <Sparkles size={34} color="#c8ff3d" />
               <h2 style={{ color: 'var(--text)' }}>Pregúntale a tu base de conocimiento</h2>
-              <p style={{ maxWidth: 460, margin: 0 }}>El agente busca en tus documentos por MCP, cita los fragmentos y recuerda lo que le pidas. A la derecha ves cada paso en vivo.</p>
+              <p style={{ maxWidth: 460, margin: 0 }}>El agente busca en tus documentos por MCP, cita los fragmentos y recuerda lo que le pidas. Cada paso queda en la traza.</p>
               <div className="suggestions">
                 {SUGGESTIONS.map((s) => <button key={s} className="chip" onClick={() => send(s)}>{s}</button>)}
               </div>

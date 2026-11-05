@@ -63,7 +63,6 @@ export default function Tools() {
     <div className="page">
       <div className="page-head">
         <div>
-          <span className="eyebrow">Protocolo</span>
           <h1>Herramientas MCP</h1>
           <p>Todo lo que el agente puede usar, descubierto por MCP en cada run: el servidor propio de Cortex y los servidores externos de backend/mcp_servers.json.</p>
         </div>

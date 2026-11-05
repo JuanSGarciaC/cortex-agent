@@ -74,30 +74,20 @@ Fragmentos recuperados por el asistente:
 Respuesta del asistente:
 {answer}
 
-faithfulness: 5 si toda afirmación está respaldada por los fragmentos (o la respuesta admite no saber), 1 si inventa.
+faithfulness: 5 si toda afirmación está respaldada por los fragmentos (o la respuesta admite no saber), 1 si inventa. Si la pregunta no depende de documentos (por ejemplo, un cálculo) y la referencia no pide fragmentos, no penalices su ausencia: califica si la respuesta es correcta.
 relevance: 5 si responde la pregunta y coincide con la referencia, 1 si no responde."""
 
 
 async def judge(question: str, reference: str, contexts: list[str], answer: str) -> dict:
-    response = await llm.client().messages.parse(
-        model=config.SMALL_MODEL,
-        max_tokens=2000,
-        output_config={"effort": "low"},
-        messages=[
-            {
-                "role": "user",
-                "content": JUDGE_PROMPT.format(
-                    question=question,
-                    reference=reference or "(sin referencia)",
-                    contexts="\n---\n".join(contexts)[:12000] or "(ninguno)",
-                    answer=answer,
-                )
-                + llm.json_instruction(Verdict),
-            }
-        ],
-        output_format=Verdict,
+    v = await llm.structured(
+        Verdict,
+        JUDGE_PROMPT.format(
+            question=question,
+            reference=reference or "(sin referencia)",
+            contexts="\n---\n".join(contexts)[:12000] or "(ninguno)",
+            answer=answer,
+        ),
     )
-    v = response.parsed_output
     if v is None:
         raise RuntimeError("El juez no devolvió un veredicto válido")
     clamp = lambda n: max(1, min(5, int(n)))  # noqa: E731
@@ -128,7 +118,11 @@ async def _run_case(kind: str, case: dict, k: int) -> tuple[bool, dict, str]:
         return False, scores, result["answer"]
     if expected:
         scores.update(retrieval_metrics(_doc_titles(result["retrieved"]), expected))
-    verdict = await judge(case["question"], case.get("reference", ""), result["contexts"], result["answer"])
+    try:
+        verdict = await judge(case["question"], case.get("reference", ""), result["contexts"], result["answer"])
+    except Exception as exc:  # a broken judge must not hide the agent's answer
+        scores["error"] = f"Juez: {llm.describe_error(exc)}"
+        return False, scores, result["answer"]
     scores.update(verdict)
     passed = scores["tool_ok"] == 1.0 and verdict["faithfulness"] >= 4 and verdict["relevance"] >= 4
     return passed, scores, result["answer"]

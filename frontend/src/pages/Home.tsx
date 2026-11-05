@@ -71,10 +71,9 @@ export default function Home() {
 
   return (
     <>
-      <SwarmCursor className="hero" count={900} color="#c8ff3d" accentColor="#5ee6ff" idle="roam" spread={110}>
+      <SwarmCursor className="hero" count={1400} color="#c8ff3d" accentColor="#5ee6ff" idle="roam" spread={230}>
         <div className="hero-inner">
-          <span className="eyebrow">Harness · MCP · RAG · Memoria · Evals</span>
-          <h1 style={{ marginTop: 18 }}>
+          <h1>
             Un agente que puedes <span className="glow">ver pensar.</span>
           </h1>
           <p className="lead">Cortex une un bucle de agente propio, herramientas MCP, búsqueda híbrida, memoria de largo plazo y evals en una sola app, y deja cada paso a la vista.</p>
@@ -97,8 +96,7 @@ export default function Home() {
       <section className="page" style={{ paddingTop: 48 }}>
         <div className="page-head">
           <div>
-            <span className="eyebrow">Módulos</span>
-            <h1 style={{ marginTop: 6 }}>Cinco piezas, un mismo registro de eventos</h1>
+            <h1>Seis piezas, un mismo registro de eventos</h1>
           </div>
         </div>
         <div className="modules">

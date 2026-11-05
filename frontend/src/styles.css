@@ -8,7 +8,7 @@
   --line-2: rgba(255, 255, 255, 0.13);
   --text: #eef0f4;
   --muted: #8b93a3;
-  --dim: #5b6372;
+  --dim: #838b9b;
   --accent: #c8ff3d;
   --accent-ink: #0b0f00;
   --cyan: #5ee6ff;
@@ -69,7 +69,6 @@ code, pre, .mono { font-family: var(--mono); }
 .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
 .page-head h1 { font-size: 30px; }
 .page-head p { margin: 4px 0 0; color: var(--muted); max-width: 680px; }
-.eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
 
 /* ---------- Surfaces ---------- */
 .card {
@@ -288,9 +287,14 @@ code, pre, .mono { font-family: var(--mono); }
   .rag, .mem { grid-template-columns: 1fr; }
 }
 @media (max-width: 860px) {
-  .shell { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+  .shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
   .rail { flex-direction: row; justify-content: space-around; border-right: 0; border-top: 1px solid var(--line); order: 2; padding: 6px; }
   .rail .logo, .rail .spacer, .rail a .tip { display: none; }
+  .rail a { flex: 1 1 0; min-width: 0; max-width: 48px; }
+  .status-dot { flex: none; }
+  .hero .swarm-cursor-canvas { opacity: 0.45; }
+  .suggestions .chip { white-space: normal; max-width: 100%; }
+  .chat .empty { grid-template-columns: minmax(0, 1fr); }
   .chat { grid-template-columns: 1fr; height: calc(100vh - 62px); }
   .chat-list { display: none; }
   .traces, .catalog { grid-template-columns: 1fr; }

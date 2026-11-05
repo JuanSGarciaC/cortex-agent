@@ -1,23 +1,39 @@
 # Evidencias de prueba (2026-11-05)
 
-Modelo: `qwen3:8b` local con Ollama 0.40.14, sobre el endpoint compatible con Anthropic, en CPU. **No es una prueba contra Claude.** Con este backend, los parámetros `betas`, `fallbacks` y `cache_control` no quedan validados, y el costo aparece en $0.
+Modelo: `qwen3:4b` local con Ollama 0.40.14, sobre el endpoint compatible con Anthropic, en una GPU AMD RX 5700. **No es una prueba contra Claude.** Con este backend, los parámetros `betas`, `fallbacks` y `cache_control` no quedan validados, y el costo aparece en $0.
 
-| Prueba | Resultado | Archivo |
+## Antes y después
+
+| Métrica | Antes (`qwen3:8b`) | Después (`qwen3:4b`) |
 |---|---|---|
-| Tests (LLM falso) | 15 de 15 | `tests.txt` |
-| Eval de retrieval, k=3 | 11 de 12 (91,7 %) | `eval-retrieval.txt` |
-| Eval de agente + juez | **2 de 6 (33,3 %)** | `eval-agente.txt`, `evals-agente.png` |
-| Chat por la interfaz | `rag_search`, cita `[chunk_id:7]`, 17 días; 381 s | `../img/chat.png`, `../img/trazas.png` |
+| Velocidad del modelo, prueba corta | 3,9 tok/s | 84,5 tok/s (entre 20 y 50 en runs reales) |
+| Eval de agente, tiempo medio por caso | 125 s | 34 a 41 s |
+| Eval de agente, aprobados | 2 de 6 | 5 de 6 y 6 de 6, en dos corridas |
+| Uso de la herramienta correcta | 60 % | 100 % en las dos corridas |
+| Chat, hasta la respuesta | 381 s | 28 a 177 s, muy variable |
+| Bloqueo del chat por extraer memoria | 209 s | 0 s (corre en segundo plano) |
+| JavaScript inicial | 566 KB | 190 KB |
+| Scroll horizontal en móvil | 10 px | 0 px |
+| Tests (LLM falso) | 15 | 19 |
 
-## Por qué falló cada caso del agente
+La API no era el cuello de botella: sus endpoints responden en 10 ms o menos. El tiempo se va en el modelo.
 
-| Caso | Causa | Origen |
-|---|---|---|
-| a02 | El juez devolvió JSON con un carácter de más y no se pudo leer. La respuesta del agente no quedó guardada. | Modelo local sin salida estructurada |
-| a04 | No usó `rag_search` y dijo no tener información. | Modelo |
-| a05 | Dijo que no hay documentos sobre el tema, sin buscar. | Modelo |
-| a06 | Respondió bien (391), pero el juez bajó la fidelidad a 1 porque no hay fragmentos. | Diseño del juez: no contempla preguntas sin documentos |
+## Por qué sigue habiendo respuestas lentas
 
-## Uso de herramientas
+`qwen3:4b` razona mucho antes de responder y a veces se enreda: una respuesta llegó a 4.341 tokens (177 s). Además, la memoria del turno anterior comparte la GPU, así que una pregunta inmediata puede esperar.
 
-Con la petición completa del harness, antes de ajustar el prompt, el modelo llamó una herramienta en 2 de 4 intentos. Sin `betas`, `fallbacks` ni `cache_control` fueron 3 de 4. Son pocas muestras para atribuir la diferencia a esos parámetros.
+## Lo que se probó y se descartó
+
+| Opción | Resultado |
+|---|---|
+| Apagar el razonamiento de `qwen3:4b` | No ahorra tokens y mezcla el razonamiento en inglés con la respuesta |
+| Quitar `output_config.effort` | Sin efecto |
+| `qwen2.5:3b` | Rápido, pero aprueba 0 a 17 %: no busca en los documentos y dice que 17 × 23 = 85,5 |
+
+## Archivos
+
+- `tests.txt`, `eval-retrieval.txt`
+- `eval-agente.txt`: corrida inicial con `qwen3:8b`
+- `eval-agente-qwen3-4b-1.txt` y `-2.txt`: corridas finales
+- `latencia-chat.txt`: última medición por la interfaz, con preguntas seguidas
+- `evals-agente.png`, `../img/chat.png`, `../img/trazas.png`, `../img/inicio.png`

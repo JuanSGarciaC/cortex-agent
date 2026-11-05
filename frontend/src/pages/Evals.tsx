@@ -63,7 +63,6 @@ export default function Evals() {
     <div className="page">
       <div className="page-head">
         <div>
-          <span className="eyebrow">Calidad</span>
           <h1>Evals</h1>
           <p>Retrieval sin LLM (recall@k y MRR) y evals del agente completo con un juez que califica fidelidad y relevancia. Cada corrida queda guardada para compararla con las anteriores.</p>
         </div>

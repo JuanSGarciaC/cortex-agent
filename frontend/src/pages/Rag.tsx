@@ -61,7 +61,6 @@ export default function Rag() {
     <div className="page">
       <div className="page-head">
         <div>
-          <span className="eyebrow">Retrieval</span>
           <h1>Mapa RAG</h1>
           <p>Cada punto es un fragmento proyectado en 2D desde su embedding. Escribe una consulta y mira dónde cae y qué vecinos recupera la búsqueda híbrida.</p>
         </div>

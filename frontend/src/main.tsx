@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 import { Brain, Database, FlaskConical, GitBranch, Home as HomeIcon, MessageSquare, Wrench } from 'lucide-react';
 import '@xyflow/react/dist/style.css';
 import './styles.css';
 import { api } from './lib/api';
-import Home from './pages/Home';
-import Chat from './pages/Chat';
-import Traces from './pages/Traces';
-import Rag from './pages/Rag';
-import MemoryPage from './pages/Memory';
-import Evals from './pages/Evals';
-import Tools from './pages/Tools';
+
+const Home = lazy(() => import('./pages/Home'));
+const Chat = lazy(() => import('./pages/Chat'));
+const Traces = lazy(() => import('./pages/Traces'));
+const Rag = lazy(() => import('./pages/Rag'));
+const MemoryPage = lazy(() => import('./pages/Memory'));
+const Evals = lazy(() => import('./pages/Evals'));
+const Tools = lazy(() => import('./pages/Tools'));
 
 const NAV = [
   { to: '/', label: 'Inicio', icon: HomeIcon },
@@ -25,9 +26,11 @@ const NAV = [
 
 function Shell() {
   const [llm, setLlm] = useState<boolean | null>(null);
+  const [model, setModel] = useState('');
   useEffect(() => {
-    api.health().then((h) => setLlm(h.llm)).catch(() => setLlm(false));
+    api.health().then((h) => { setLlm(h.llm); setModel(h.agent_model); }).catch(() => setLlm(false));
   }, []);
+  const status = llm ? `Modelo: ${model}` : 'Sin modelo configurado';
   return (
     <div className="shell">
       <nav className="rail" aria-label="Principal">
@@ -41,18 +44,20 @@ function Shell() {
           </NavLink>
         ))}
         <div className="spacer" />
-        <span className={`status-dot ${llm ? 'on' : ''}`} title={llm ? 'API de Claude configurada' : 'Falta ANTHROPIC_API_KEY'} role="status" aria-label={llm ? 'API de Claude configurada' : 'Falta ANTHROPIC_API_KEY'} />
+        <span className={`status-dot ${llm ? 'on' : ''}`} title={status} role="status" aria-label={status} />
       </nav>
       <main className="main">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/trazas" element={<Traces />} />
-          <Route path="/rag" element={<Rag />} />
-          <Route path="/memoria" element={<MemoryPage />} />
-          <Route path="/evals" element={<Evals />} />
-          <Route path="/herramientas" element={<Tools />} />
-        </Routes>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/trazas" element={<Traces />} />
+            <Route path="/rag" element={<Rag />} />
+            <Route path="/memoria" element={<MemoryPage />} />
+            <Route path="/evals" element={<Evals />} />
+            <Route path="/herramientas" element={<Tools />} />
+          </Routes>
+        </Suspense>
       </main>
     </div>
   );

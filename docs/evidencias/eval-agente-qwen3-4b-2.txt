@@ -1,0 +1,17 @@
+PASS  a01      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 95240, "run_id": 63, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta 17 días hábiles se calcula correctamente según la política: 15 días base más 2 días adicionales (después del quinto año) para 7 años, coincidiendo con la referencia y los fragmentos recuperados"}
+PASS  a02      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 19820, "run_id": 64, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta se basa en el tope diario de alimentación en ciudades principales (Cali) del documento 'politica-gastos' (chunk_id:5), calculando 120.000 COP/día * 2 días = 240.000 COP"}
+PASS  a03      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 24472, "run_id": 65, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta se basa únicamente en el fragmento recuperado y coincide con la referencia para el caso de P1 fuera de horario (domingo)."}
+PASS  a04      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 30448, "run_id": 66, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta menciona correctamente que la medicina prepagada está disponible después del periodo de prueba según el fragmento recuperado de onboarding (chunk_id: 3), que coincide con la referencia"}
+PASS  a05      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 27532, "run_id": 67, "faithfulness": 5, "relevance": 5, "reason": "La respuesta correctamente indica que no hay información relevante sobre políticas de teletrabajo internacional en la base de conocimiento, alineándose con los fragmentos recuperados que corresponden a políticas de seguridad de información y no a temas de teletrabajo."}
+PASS  a06      {"tool_ok": 1.0, "steps": 1, "cost_usd": 0.0, "ms": 5550, "run_id": 68, "faithfulness": 5, "relevance": 5, "reason": "La respuesta es correcta y no requiere fragmentos recuperados ya que es un cálculo simple"}
+{
+  "cases": 6,
+  "pass_rate": 1.0,
+  "avg_tool_ok": 1.0,
+  "avg_recall": 1.0,
+  "avg_faithfulness": 5.0,
+  "avg_relevance": 5.0,
+  "avg_steps": 1.8333,
+  "avg_cost_usd": 0.0,
+  "avg_ms": 33843.6667
+}

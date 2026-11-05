@@ -4,7 +4,7 @@ from typing import Literal
 import numpy as np
 from pydantic import BaseModel, Field
 
-from . import config, db, llm
+from . import db, llm
 from .embed import embed, from_blob, to_blob
 
 KINDS = ("preferencia", "hecho", "objetivo", "contexto")
@@ -100,12 +100,5 @@ EXTRACT_PROMPT = (
 
 
 async def extract(user_text: str, answer: str) -> list[Fact]:
-    response = await llm.client().messages.parse(
-        model=config.SMALL_MODEL,
-        max_tokens=2000,
-        output_config={"effort": "low"},
-        messages=[{"role": "user", "content": EXTRACT_PROMPT.format(user=user_text, answer=answer[:4000]) + llm.json_instruction(Facts)}],
-        output_format=Facts,
-    )
-    parsed = response.parsed_output
+    parsed = await llm.structured(Facts, EXTRACT_PROMPT.format(user=user_text, answer=answer[:4000]))
     return parsed.facts[:3] if parsed else []
