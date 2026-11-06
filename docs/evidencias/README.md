@@ -14,7 +14,7 @@ Corrida única con la capa gratuita de Gemini, sobre una base de datos limpia. S
 
 - **a06:** el agente respondió, pero el juez no lo calificó: se agotó la cuota gratuita de 20 peticiones diarias de ese modelo. No es un fallo del agente.
 - **Chat con otro modelo:** esa misma cuota cortó una primera pregunta con `gemini-3.6-flash`, que aparece como `error` en `../img/trazas.png`. La pregunta se repitió una vez con `gemini-3.5-flash-lite`.
-- **Latencia del eval:** los 43,4 s de media incluyen las esperas del traductor (mínimo 7,5 s entre peticiones) y los reintentos por cuota. Sin esas esperas, los primeros casos terminaron en 10 a 16 s, en su mayoría.
+- **Latencia del eval:** los 43,4 s de media incluyen las esperas del traductor (mínimo 7,5 s entre peticiones) y los reintentos por cuota. Los tres primeros casos, antes de agotar la cuota, terminaron en 10 a 16 s con esas esperas incluidas.
 - **Intentos descartados:** antes hubo dos corridas sin ningún resultado del modelo: `gemini-2.5-flash` ya no está disponible para cuentas nuevas y `gemini-3.8-flash` estaba saturado.
 
 Archivos: `eval-agente-gemini.txt`, `latencia-chat-gemini.txt`, `gemini-evals.png`, `../img/chat.png`, `../img/trazas.png`.
