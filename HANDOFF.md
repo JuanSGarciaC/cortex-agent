@@ -11,9 +11,10 @@ Una sola app que reúne un harness de agente propio, MCP, RAG, memoria y evals, 
 - Servidor MCP por stdio probado: `python -m app.mcp_server`.
 - Repo privado en GitHub (`JuanSGarciaC/cortex-agent`), con CI en verde.
 - Probado con un modelo real y local (`qwen3:4b` en Ollama): el eval de agente aprobó 5 de 6 y 6 de 6, y el chat responde en 28 a 177 s. Detalle en `docs/evidencias/README.md`.
+- Probado una vez con Gemini en la nube, mediante un traductor temporal ya eliminado: eval de agente 5 de 6 y chat de 8,6 s con la respuesta correcta. Detalle en `docs/evidencias/README.md`.
 
 ## Pendiente (en orden)
-1. **Probar con la API real de Claude.** Sigue sin hacerse: Ollama no valida los parámetros propios de Anthropic.
+1. **Probar con la API real de Claude.** Sigue sin hacerse: ni Ollama ni la prueba con Gemini validan los parámetros propios de Anthropic.
    - Poner `ANTHROPIC_API_KEY=sk-ant-...` en `backend/.env` y quitar las líneas de Ollama.
    - Prueba: «¿Cuántos días de vacaciones tengo si llevo 7 años?». Debe llamar `rag_search`, citar `[chunk_id]` y responder 17 días.
    - Si `harness.py` da 400, quitar primero `fallbacks` y `betas`.

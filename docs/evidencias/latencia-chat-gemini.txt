@@ -1,0 +1,2 @@
+fin 9.0s | chips 2 | bot: cortex  Según la política de vacaciones, tienes derecho a 15 días hábiles base, más un día adicional por cada año trabajado después del quinto año 7.  Como llevas 7 años en la empresa (2 años adicionales después del 5º), te corresponden 17 días hábiles de vacaciones 7.
+errores 0 []

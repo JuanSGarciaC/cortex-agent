@@ -1,0 +1,17 @@
+PASS  a01      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 11523, "run_id": 1, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta es completamente fiel al fragmento 7 y calcula de manera exacta los 17 días hábiles correspondientes a los 7 años de antigüedad."}
+PASS  a02      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 9697, "run_id": 2, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta responde de manera precisa a la pregunta realizando el cálculo correcto y toda la información proporcionada está debidamente respaldada por los fragmentos."}
+PASS  a03      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 15542, "run_id": 3, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta indica con precisión el número de la línea de guardia al ser un caso P1 fuera de horario, apoyándose totalmente en los fragmentos recuperados."}
+PASS  a04      {"tool_ok": 1.0, "steps": 4, "cost_usd": 0.0, "ms": 49370, "run_id": 4, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta está totalmente respaldada por los fragmentos citados y responde con precisión a la pregunta, coincidiendo con la referencia."}
+PASS  a05      {"tool_ok": 1.0, "steps": 4, "cost_usd": 0.0, "ms": 47176, "run_id": 5, "faithfulness": 5, "relevance": 5, "reason": "El asistente indica correctamente que no encontró información sobre la política de teletrabajo internacional en los documentos, cumpliendo fielmente con la respuesta de referencia."}
+FAIL  a06      {"tool_ok": 1.0, "steps": 1, "cost_usd": 0.0, "ms": 127217, "run_id": 6, "error": "Juez: Límite de solicitudes de la API alcanzado. Intenta en unos segundos."}
+{
+  "cases": 6,
+  "pass_rate": 0.8333,
+  "avg_tool_ok": 1.0,
+  "avg_recall": 1.0,
+  "avg_faithfulness": 5.0,
+  "avg_relevance": 5.0,
+  "avg_steps": 2.5,
+  "avg_cost_usd": 0.0,
+  "avg_ms": 43420.8333
+}
