@@ -9,17 +9,16 @@ Una sola app que reúne un harness de agente propio, MCP, RAG, memoria y evals, 
 - 19 tests en verde: `cd backend && .venv\Scripts\python -m pytest -q`. Usan un cliente LLM falso.
 - Eval de retrieval con embeddings reales: aprueba el 91,7 % con k=3.
 - Servidor MCP por stdio probado: `python -m app.mcp_server`.
+- Repo privado en GitHub (`JuanSGarciaC/cortex-agent`), con CI en verde.
 - Probado con un modelo real y local (`qwen3:4b` en Ollama): el eval de agente aprobó 5 de 6 y 6 de 6, y el chat responde en 28 a 177 s. Detalle en `docs/evidencias/README.md`.
 
 ## Pendiente (en orden)
-1. **Subir a GitHub como repo privado.** El clasificador de permisos bloqueó la subida; la tiene que correr el usuario:
-   `gh repo create JuanSGarciaC/cortex-agent --private --source . --push`
-2. **Probar con la API real de Claude.** Sigue sin hacerse: Ollama no valida los parámetros propios de Anthropic.
+1. **Probar con la API real de Claude.** Sigue sin hacerse: Ollama no valida los parámetros propios de Anthropic.
    - Poner `ANTHROPIC_API_KEY=sk-ant-...` en `backend/.env` y quitar las líneas de Ollama.
    - Prueba: «¿Cuántos días de vacaciones tengo si llevo 7 años?». Debe llamar `rag_search`, citar `[chunk_id]` y responder 17 días.
    - Si `harness.py` da 400, quitar primero `fallbacks` y `betas`.
    - Después correr `python -m app.evals agente_rag.json`.
-3. Opcional: autenticación si se expone fuera de localhost; mitigar que un documento con instrucciones haga que el agente llame `memory_save`.
+2. Opcional: autenticación si se expone fuera de localhost; mitigar que un documento con instrucciones haga que el agente llame `memory_save`.
 
 ## Cómo levantar
 `run.bat` en la raíz, o por separado:
