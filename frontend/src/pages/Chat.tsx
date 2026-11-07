@@ -124,7 +124,7 @@ export default function Chat() {
       <section className="chat-main">
         <div className="messages">
           {!llm && (
-            <div className="notice"><KeyRound size={16} /> Falta ANTHROPIC_API_KEY en backend/.env. El RAG, la memoria y las herramientas funcionan; el chat necesita la key.</div>
+            <div className="notice"><KeyRound size={16} /> Falta configurar el modelo en backend/.env. El RAG, la memoria y las herramientas funcionan; el chat necesita un modelo.</div>
           )}
           {!turns.length && (
             <div className="empty" style={{ marginTop: '12vh' }}>

@@ -8,7 +8,7 @@ Una sola app que reúne un **harness de agente propio**, **MCP** (servidor y cli
 
 | Módulo | Qué hace |
 |---|---|
-| **Harness** (`backend/app/harness.py`) | Bucle escrito a mano sobre la Messages API de Claude, sin frameworks de agentes. Tiene límite de pasos y de costo, ejecuta herramientas en paralelo, maneja cada `stop_reason` (`tool_use`, `pause_turn`, `refusal`, `max_tokens`), usa fallbacks del servidor y mantiene el historial válido aunque el run se corte. |
+| **Harness** (`backend/app/harness.py`) | Bucle escrito a mano con el SDK de Anthropic, sin frameworks de agentes. Tiene límite de pasos y de costo, ejecuta herramientas en paralelo, maneja cada `stop_reason` (`tool_use`, `pause_turn`, `refusal`, `max_tokens`) y mantiene el historial válido aunque el run se corte. |
 | **MCP** (`mcp_server.py`, `tools.py`) | Servidor MCP propio con `rag_search`, `rag_list_documents`, `memory_save` y `memory_recall`. El agente consume **todas** las herramientas por MCP: el servidor propio en proceso y los externos por stdio desde `mcp_servers.json`. |
 | **RAG** (`rag.py`) | Ingesta de `.txt`, `.md` y `.pdf`; chunking con solape; búsqueda híbrida BM25 (SQLite FTS5) + vectores (embeddings locales con `fastembed`), fusionada con Reciprocal Rank Fusion; citas por fragmento. |
 | **Memoria** (`memory.py`) | Hechos de largo plazo con embedding. Al final de cada turno, un modelo pequeño con salida estructurada extrae hasta 3 hechos; se deduplican por similitud y se inyectan en el siguiente turno. |
@@ -19,7 +19,8 @@ Una sola app que reúne un **harness de agente propio**, **MCP** (servidor y cli
 flowchart LR
   UI[React + Vite] -- SSE --> API[FastAPI]
   API --> H[Harness]
-  H -- Messages API --> C[Claude]
+  H -- formato Anthropic --> P[Traductor local]
+  P --> C[Gemini]
   H -- MCP --> S[Servidor MCP propio]
   H -- MCP stdio --> X[Servidores MCP externos]
   S --> R[RAG: FTS5 + vectores]
@@ -42,6 +43,15 @@ También están el **Chat**, con una traza en vivo al lado de la respuesta, y **
 |---|---|
 | ![Chat](docs/img/chat.png) **Chat** | ![Trazas](docs/img/trazas.png) **Trazas** |
 
+## Con qué se probó
+
+| Modelo | Eval de agente | Chat | Notas |
+|---|---|---|---|
+| **Gemini** (`gemini-3.6-flash`, juez con `gemini-3.5-flash-lite`) | **6 de 6**, 7,9 s por caso | 17 días con cita, 13,8 s | Una corrida en la capa gratuita |
+| **Ollama** (`qwen3:4b`, local) | 5 de 6 y 6 de 6 | 28 a 177 s | Una vez respondió 20 días en lugar de 17 |
+
+**No se probó con la API de Claude.** La app usa el SDK de Anthropic porque el traductor y Ollama aceptan ese formato, pero los parámetros propios de Claude que envía el harness (`betas`, `fallbacks`, `thinking`, `cache_control`, `effort`) quedan sin validar. Detalle en [`docs/evidencias`](docs/evidencias/README.md).
+
 ## Cómo correrlo
 
 Requisitos: Python 3.12 y Node 20 o superior.
@@ -55,15 +65,21 @@ La primera vez crea el entorno virtual, instala dependencias, carga el manual de
 - Frontend: http://localhost:5173
 - API: http://localhost:8000/docs
 
-Para el chat y los evals de agente, agrega tu key en `backend/.env`:
+Para el chat y los evals de agente, pega una key de [Google AI Studio](https://aistudio.google.com/apikey) en `backend/.env`, que `run.bat` crea así:
 
 ```
-ANTHROPIC_API_KEY=sk-ant-...
+ANTHROPIC_BASE_URL=http://localhost:8787
+ANTHROPIC_AUTH_TOKEN=gemini-proxy
+AGENT_MODEL=gemini-3.6-flash
+SMALL_MODEL=gemini-3.5-flash-lite
+GEMINI_API_KEY=tu_key
 ```
 
-Sin key funcionan el RAG, el mapa, la memoria, el catálogo MCP y los evals de retrieval.
+La app solo habla el formato de Anthropic, así que `backend/app/gemini_proxy.py` traduce las peticiones a Gemini. `run.bat` levanta ese traductor en el puerto 8787 cuando `.env` apunta a él. El costo aparece en $0 porque esos modelos no están en la tabla de precios, y la capa gratuita tiene límites de peticiones.
 
-### Sin costo: modelo local con Ollama
+Sin key funcionan el RAG, el mapa, el catálogo MCP y los evals de retrieval.
+
+### Sin costo y sin internet: modelo local con Ollama
 
 Instala [Ollama](https://ollama.com), corre `ollama pull qwen3:4b` y usa este `backend/.env`:
 
@@ -78,10 +94,10 @@ No tiene límite de peticiones, pero una respuesta puede tardar de 30 s a 3 min 
 
 ### Variables opcionales (`backend/.env`)
 
-| Variable | Valor por defecto |
+| Variable | Valor por defecto en el código |
 |---|---|
-| `AGENT_MODEL` | `claude-opus-5-5` |
-| `SMALL_MODEL` (juez y extracción de memoria) | `claude-haiku-5-5` |
+| `AGENT_MODEL` | `claude-opus-5-5` (sin probar) |
+| `SMALL_MODEL` (juez y extracción de memoria) | `claude-haiku-5-5` (sin probar) |
 | `AGENT_EFFORT` | `medium` |
 | `MAX_STEPS` / `MAX_COST_USD` | `8` / `0.50` |
 | `EMBED_MODEL` | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` |
@@ -120,11 +136,12 @@ El comando sale con código 1 si la tasa de aprobados queda bajo `--min-pass`. E
 cd backend && python -m pytest -q
 ```
 
-Son 19 tests. Usan un cliente LLM falso con respuestas guionadas y embeddings deterministas, así que no gastan API ni descargan modelos. Cubren el bucle del harness (herramientas, límite de pasos, rechazo, falta de credenciales), MCP en proceso, la búsqueda híbrida, la memoria, los evals (incluido el juez) y la API con SSE.
+Son 21 tests. Usan un cliente LLM falso con respuestas guionadas y embeddings deterministas, así que no gastan API ni descargan modelos. Cubren el bucle del harness (herramientas, límite de pasos, rechazo, falta de credenciales), MCP en proceso, la búsqueda híbrida, la memoria, los evals (incluido el juez), la API con SSE y el traductor de Gemini.
 
 ## Decisiones y límites conocidos
 
 - **Harness manual en lugar del Tool Runner del SDK**, para controlar y trazar cada paso.
+- **Traductor en lugar de reescribir el harness para Gemini.** El harness no cambia, pero el traductor descarta los parámetros propios de Claude.
 - **Búsqueda vectorial por fuerza bruta en numpy.** Va bien hasta unos 50 mil fragmentos; más allá conviene `sqlite-vec`.
 - **PCA en lugar de UMAP** para el mapa 2D: menos dependencias, a cambio de grupos menos separados.
 - **Los servidores MCP externos se abren en cada run.** Es simple y aísla fallos, pero agrega latencia si son lentos al arrancar.

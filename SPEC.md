@@ -6,7 +6,7 @@ Una sola app que reúne un **harness de agente propio**, **MCP** (servidor y cli
 
 | Módulo | Responsabilidad |
 |---|---|
-| `app/harness.py` | Bucle del agente sobre la Messages API de Claude. Límite de pasos y de costo, manejo de `stop_reason`, ejecución paralela de herramientas, un evento por paso. |
+| `app/harness.py` | Bucle del agente con el SDK de Anthropic. Límite de pasos y de costo, manejo de `stop_reason`, ejecución paralela de herramientas, un evento por paso. |
 | `app/mcp_server.py` | Servidor MCP propio (`MCPServer`) con `rag_search`, `rag_list_documents`, `memory_save`, `memory_recall`. También corre por stdio: `python -m app.mcp_server`. |
 | `app/tools.py` | Cliente MCP: abre el servidor propio en proceso y los externos de `mcp_servers.json` (stdio), y expone una lista única de herramientas. |
 | `app/rag.py` | Ingesta (txt, md, pdf), chunking con solape, búsqueda híbrida (FTS5 BM25 + coseno) fusionada con RRF, proyección 2D (PCA) para el mapa. |
@@ -25,7 +25,7 @@ Una sola app que reúne un **harness de agente propio**, **MCP** (servidor y cli
 - `GET /api/rag/map?q=` → puntos 2D de chunks + consulta + vecinos
 - `GET /api/memories`, `DELETE /api/memories/{id}`, `GET /api/memories/graph`
 - `GET /api/tools` → catálogo MCP
-- `GET /api/evals/datasets`, `POST /api/evals/run`, `GET /api/evals/runs`, `GET /api/evals/runs/{id}`
+- `GET /api/evals/datasets`, `POST /api/evals/run`, `GET /api/evals/runs`
 - `GET /api/health`
 
 ## Frontend (React, Vite, TypeScript)
@@ -39,4 +39,4 @@ Tema oscuro, íconos `lucide-react`, sin emojis.
 - **Herramientas**: catálogo en grilla con filtros laterales y conteos.
 
 ## Modelos
-`AGENT_MODEL=claude-opus-5-5` (pensamiento adaptativo, effort `medium`, fallbacks del servidor). `SMALL_MODEL=claude-haiku-5-5` para el juez y la extracción de memoria.
+En uso: `AGENT_MODEL=gemini-3.6-flash` y `SMALL_MODEL=gemini-3.5-flash-lite` (juez y extracción de memoria), a través de `app/gemini_proxy.py`. Alternativa local: Ollama. Los valores por defecto del código son modelos de Claude, sin probar.

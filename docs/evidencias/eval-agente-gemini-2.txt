@@ -1,0 +1,17 @@
+PASS  a01      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 9584, "run_id": 2, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta es totalmente correcta, está respaldada por los fragmentos recuperados y responde con precisión a la pregunta planteada."}
+PASS  a02      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 7870, "run_id": 3, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta utiliza correctamente los fragmentos recuperados para calcular el monto total y añade información relevante de la política de gastos."}
+PASS  a03      {"tool_ok": 1.0, "steps": 2, "cost_usd": 0.0, "ms": 10969, "run_id": 4, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta utiliza correctamente la información de los fragmentos para identificar que es un caso P1 fuera de horario y proporciona el número de la línea de guardia indicado."}
+PASS  a04      {"tool_ok": 1.0, "steps": 3, "cost_usd": 0.0, "ms": 8066, "run_id": 5, "recall": 1.0, "mrr": 1.0, "faithfulness": 5, "relevance": 5, "reason": "La respuesta utiliza correctamente la información de los fragmentos recuperados para responder con precisión a la pregunta sobre cuándo se obtiene la medicina prepagada."}
+PASS  a05      {"tool_ok": 1.0, "steps": 4, "cost_usd": 0.0, "ms": 7783, "run_id": 6, "faithfulness": 5, "relevance": 5, "reason": "El asistente identifica correctamente que la información no está en los fragmentos y responde acorde a la referencia."}
+PASS  a06      {"tool_ok": 1.0, "steps": 1, "cost_usd": 0.0, "ms": 2933, "run_id": 7, "faithfulness": 5, "relevance": 5, "reason": "El asistente calculó correctamente el resultado matemático sin necesidad de fragmentos y coincide plenamente con la referencia."}
+{
+  "cases": 6,
+  "pass_rate": 1.0,
+  "avg_tool_ok": 1.0,
+  "avg_recall": 1.0,
+  "avg_faithfulness": 5.0,
+  "avg_relevance": 5.0,
+  "avg_steps": 2.3333,
+  "avg_cost_usd": 0.0,
+  "avg_ms": 7867.5
+}

@@ -1,8 +1,28 @@
 # Evidencias de prueba
 
-## Prueba con un modelo real en la nube (2026-11-05)
+## Prueba con Gemini y traductor en el repo (2026-11-06)
 
-Corrida única con la capa gratuita de Gemini, sobre una base de datos limpia. Se usó un traductor temporal de la API de Anthropic a la de Gemini, fuera del repo y ya eliminado; la app no cambió ni usa Gemini.
+Base de datos temporal recién cargada con `seed.py`, a través de `backend/app/gemini_proxy.py`. Agente con `gemini-3.6-flash`; juez y memoria con `gemini-3.5-flash-lite`.
+
+**No valida Claude.** El traductor descarta `betas`, `fallbacks`, `thinking`, `cache_control` y `effort`. El costo aparece en $0 porque esos modelos no están en la tabla de precios.
+
+| Prueba | Resultado |
+|---|---|
+| Eval de agente + juez | **6 de 6**, recall 1,00, fidelidad y relevancia 5/5 |
+| Herramienta correcta | 6 de 6 |
+| Tiempo medio por caso | 7,9 s (1 a 4 pasos) |
+| Chat por `POST /api/chat` | 17 días con cita `[7]`, 2 pasos, 8,6 s |
+| Chat en el navegador | 17 días con cita `[7]`, 2 pasos, 13,8 s, sin errores en la consola |
+
+Hubo un 429 durante el eval, que el reintento del SDK resolvió. Es una sola corrida en la capa gratuita.
+
+Archivos: `eval-agente-gemini-2.txt` (sin las líneas de log HTTP), `gemini-evals-2.png` y todas las capturas de `../img/`.
+
+---
+
+## Primera prueba con Gemini (2026-11-05)
+
+Corrida única con la capa gratuita de Gemini, sobre una base de datos limpia. Se usó un traductor temporal fuera del repo, reemplazado después por `backend/app/gemini_proxy.py`.
 
 **No valida Claude.** El traductor descarta `betas`, `fallbacks`, `thinking`, `cache_control` y `effort`, así que esa parte de `harness.py` sigue sin probarse contra la API de Claude. El costo aparece en $0 porque esos modelos no están en la tabla de precios.
 
@@ -13,11 +33,11 @@ Corrida única con la capa gratuita de Gemini, sobre una base de datos limpia. S
 | Chat por la interfaz | `gemini-3.5-flash-lite` | 17 días con cita, 2 pasos, **8,6 s** |
 
 - **a06:** el agente respondió, pero el juez no lo calificó: se agotó la cuota gratuita de 20 peticiones diarias de ese modelo. No es un fallo del agente.
-- **Chat con otro modelo:** esa misma cuota cortó una primera pregunta con `gemini-3.6-flash`, que aparece como `error` en `../img/trazas.png`. La pregunta se repitió una vez con `gemini-3.5-flash-lite`.
+- **Chat con otro modelo:** esa misma cuota cortó una primera pregunta con `gemini-3.6-flash`. La pregunta se repitió una vez con `gemini-3.5-flash-lite`.
 - **Latencia del eval:** los 43,4 s de media incluyen las esperas del traductor (mínimo 7,5 s entre peticiones) y los reintentos por cuota. Los tres primeros casos, antes de agotar la cuota, terminaron en 10 a 16 s con esas esperas incluidas.
 - **Intentos descartados:** antes hubo dos corridas sin ningún resultado del modelo: `gemini-2.5-flash` ya no está disponible para cuentas nuevas y `gemini-3.8-flash` estaba saturado.
 
-Archivos: `eval-agente-gemini.txt`, `latencia-chat-gemini.txt`, `gemini-evals.png`, `../img/chat.png`, `../img/trazas.png`.
+Archivos: `eval-agente-gemini.txt`, `latencia-chat-gemini.txt`, `gemini-evals.png`.
 
 ---
 
@@ -59,7 +79,7 @@ La API no era el cuello de botella: sus endpoints responden en 10 ms o menos. El
 - `eval-agente.txt`: corrida inicial con `qwen3:8b`
 - `eval-agente-qwen3-4b-1.txt` y `-2.txt`: corridas finales
 - `latencia-chat.txt`: última medición por la interfaz, con preguntas seguidas
-- `evals-agente.png`, `../img/inicio.png`
+- `evals-agente.png`
 
 ## Fallo de calidad detectado
 

@@ -66,7 +66,7 @@ export default function Evals() {
           <h1>Evals</h1>
           <p>Retrieval sin LLM (recall@k y MRR) y evals del agente completo con un juez que califica fidelidad y relevancia. Cada corrida queda guardada para compararla con las anteriores.</p>
         </div>
-        <button className="btn primary" onClick={run} disabled={!active || running || (ds?.kind === 'agent' && !llm)} title={ds?.kind === 'agent' && !llm ? 'Necesita ANTHROPIC_API_KEY' : undefined}>
+        <button className="btn primary" onClick={run} disabled={!active || running || (ds?.kind === 'agent' && !llm)} title={ds?.kind === 'agent' && !llm ? 'Necesita un modelo configurado en backend/.env' : undefined}>
           {running ? <Loader2 size={16} className="spin" /> : <Play size={16} />} {running ? 'Corriendo...' : 'Correr dataset'}
         </button>
       </div>

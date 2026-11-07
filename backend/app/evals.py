@@ -143,7 +143,7 @@ async def run_dataset(file: str, k: int = 5) -> dict:
     data = load_dataset(file)
     kind = data["kind"]
     if kind == "agent" and not config.has_llm_credentials():
-        raise llm.LLMUnavailable("Los evals de agente necesitan ANTHROPIC_API_KEY.")
+        raise llm.LLMUnavailable("Los evals de agente necesitan un modelo configurado en backend/.env.")
     results = []
     for case in data["cases"]:
         try:

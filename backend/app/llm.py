@@ -23,7 +23,7 @@ def client():
     if _client is None:
         if not config.has_llm_credentials():
             raise LLMUnavailable(
-                "Falta ANTHROPIC_API_KEY. Agrégala en backend/.env y reinicia el backend."
+                "Falta configurar el modelo en backend/.env. Revisa «Cómo correrlo» en el README y reinicia el backend."
             )
         _client = anthropic.AsyncAnthropic()
     return _client
@@ -70,7 +70,7 @@ def describe_error(exc: Exception) -> str:
     if isinstance(exc, LLMUnavailable):
         return str(exc)
     if isinstance(exc, anthropic.AuthenticationError):
-        return "La API key de Anthropic no es válida."
+        return "La API key del modelo no es válida. Revisa backend/.env."
     if isinstance(exc, anthropic.RateLimitError):
         return "Límite de solicitudes de la API alcanzado. Intenta en unos segundos."
     if isinstance(exc, anthropic.BadRequestError):
@@ -78,5 +78,5 @@ def describe_error(exc: Exception) -> str:
     if isinstance(exc, anthropic.APIStatusError):
         return f"Error de la API ({exc.status_code}): {exc.message}"
     if isinstance(exc, anthropic.APIConnectionError):
-        return "No hay conexión con la API de Anthropic."
+        return "No hay conexión con el modelo. Revisa que el traductor u Ollama estén corriendo."
     return f"{type(exc).__name__}: {exc}"

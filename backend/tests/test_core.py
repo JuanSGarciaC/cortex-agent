@@ -112,7 +112,7 @@ def test_harness_reports_missing_credentials(monkeypatch):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     monkeypatch.delenv("ANTHROPIC_AUTH_TOKEN", raising=False)
     result = asyncio.run(run_agent("hola"))
-    assert result["status"] == "error" and "ANTHROPIC_API_KEY" in result["answer"]
+    assert result["status"] == "error" and "backend/.env" in result["answer"]
     with db.session() as conn:
         assert conn.execute("SELECT COUNT(*) FROM messages").fetchone()[0] == 0
 
