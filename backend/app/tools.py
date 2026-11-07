@@ -33,7 +33,12 @@ class ToolHub:
     async def __aenter__(self):
         await self._connect(OWN, own_server)
         if self.include_external:
-            for name, spec in load_external_config().items():
+            try:
+                servers = load_external_config().items()
+            except Exception as exc:  # a broken config file must not take the agent down either
+                self.errors[config.MCP_SERVERS_FILE.name] = f"{type(exc).__name__}: {exc}"
+                servers = []
+            for name, spec in servers:
                 try:
                     params = StdioServerParameters(
                         command=spec["command"], args=spec.get("args", []), env=spec.get("env")

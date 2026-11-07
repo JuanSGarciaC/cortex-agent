@@ -100,7 +100,7 @@ No tiene límite de peticiones, pero una respuesta puede tardar de 30 s a 3 min 
 | `SMALL_MODEL` (juez y extracción de memoria) | `claude-haiku-5-5` (sin probar) |
 | `AGENT_EFFORT` | `medium` |
 | `MAX_STEPS` / `MAX_COST_USD` | `8` / `0.50` |
-| `EMBED_MODEL` | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` |
+| `EMBED_MODEL` | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`. Si lo cambias, usa una base nueva: los vectores guardados no sirven con otro modelo y la búsqueda falla. |
 
 ## Usar el servidor MCP desde otro cliente
 
@@ -136,7 +136,7 @@ El comando sale con código 1 si la tasa de aprobados queda bajo `--min-pass`. E
 cd backend && python -m pytest -q
 ```
 
-Son 21 tests. Usan un cliente LLM falso con respuestas guionadas y embeddings deterministas, así que no gastan API ni descargan modelos. Cubren el bucle del harness (herramientas, límite de pasos, rechazo, falta de credenciales), MCP en proceso, la búsqueda híbrida, la memoria, los evals (incluido el juez), la API con SSE y el traductor de Gemini.
+Son 26 tests. Usan un cliente LLM falso con respuestas guionadas y embeddings deterministas, así que no gastan API ni descargan modelos. Cubren el bucle del harness (herramientas, límite de pasos, rechazo, falta de credenciales), MCP en proceso, la búsqueda híbrida, la memoria, los evals (incluido el juez), la API con SSE y el traductor de Gemini.
 
 ## Decisiones y límites conocidos
 
@@ -145,7 +145,8 @@ Son 21 tests. Usan un cliente LLM falso con respuestas guionadas y embeddings de
 - **Búsqueda vectorial por fuerza bruta en numpy.** Va bien hasta unos 50 mil fragmentos; más allá conviene `sqlite-vec`.
 - **PCA en lugar de UMAP** para el mapa 2D: menos dependencias, a cambio de grupos menos separados.
 - **Los servidores MCP externos se abren en cada run.** Es simple y aísla fallos, pero agrega latencia si son lentos al arrancar.
-- **Sin autenticación.** Es una app local de un solo usuario; no la expongas a internet tal cual.
+- **Sin autenticación.** Es una app local de un solo usuario; no la expongas a internet tal cual. Rechaza las peticiones que vienen de otros sitios web (`CORS_ORIGINS`).
+- **Borrar una conversación borra sus trazas**, pero no los hechos de memoria que salieron de ella: esos se borran en la vista Memoria.
 
 ## Licencia
 

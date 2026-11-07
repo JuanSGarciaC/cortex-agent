@@ -25,7 +25,9 @@ MAX_STEPS = int(os.getenv("MAX_STEPS", "8"))
 MAX_COST_USD = float(os.getenv("MAX_COST_USD", "0.50"))
 EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
 MCP_SERVERS_FILE = Path(os.getenv("MCP_SERVERS_FILE", BASE_DIR / "mcp_servers.json"))
-CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+CORS_ORIGINS = os.getenv(
+    "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:8000,http://127.0.0.1:8000"
+).split(",")
 
 # USD per million tokens (input, output). Unknown models cost 0 in the tracker.
 PRICES = {

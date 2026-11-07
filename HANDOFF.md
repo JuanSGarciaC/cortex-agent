@@ -6,7 +6,7 @@ Una sola app que reúne un harness de agente propio, MCP, RAG, memoria y evals, 
 ## Qué está hecho y verificado
 - Backend FastAPI + SQLite en `backend/app/`: harness, MCP (servidor y cliente), RAG, memoria, evals y API con SSE.
 - Frontend React/Vite en `frontend/src/` con siete vistas.
-- 21 tests en verde: `cd backend && .venv\Scripts\python -m pytest -q`. Usan un cliente LLM falso.
+- 26 tests en verde: `cd backend && .venv\Scripts\python -m pytest -q`. Usan un cliente LLM falso.
 - Eval de retrieval con embeddings reales: aprueba el 91,7 % con k=3.
 - Servidor MCP por stdio probado: `python -m app.mcp_server`.
 - Repo privado en GitHub (`JuanSGarciaC/cortex-agent`), con CI en verde.

@@ -198,8 +198,16 @@ async def run_agent(
         status = "error"
         answer = llm.describe_error(exc)
         tracer.emit("error", where="harness", message=answer)
+        # Keep the question for the next turn, but drop partial tool steps: they could leave the history invalid.
+        _persist(
+            conv_id,
+            [
+                {"role": "user", "content": [{"type": "text", "text": message}]},
+                {"role": "assistant", "content": [{"type": "text", "text": f"(Este turno falló: {answer})"}]},
+            ],
+        )
 
-    ms = round((time.perf_counter() - started) * 1000)
+    ms =round((time.perf_counter() - started) * 1000)
     with db.session() as conn:
         conn.execute(
             "UPDATE runs SET status=?, steps=?, input_tokens=?, output_tokens=?, cost_usd=?, ended_at=? WHERE id=?",

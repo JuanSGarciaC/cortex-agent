@@ -1,4 +1,16 @@
-from app.gemini_proxy import from_gemini, to_gemini
+from fastapi.testclient import TestClient
+
+from app.gemini_proxy import app, from_gemini, to_gemini
+
+
+def test_requires_auth_header_and_key(monkeypatch):
+    client = TestClient(app)
+    body = {"model": "m", "messages": []}
+    monkeypatch.setenv("GEMINI_API_KEY", "x")
+    assert client.post("/v1/messages", json=body).status_code == 401  # a web page cannot spend the key
+    monkeypatch.delenv("GEMINI_API_KEY")
+    missing = client.post("/v1/messages", json=body, headers={"x-api-key": "local"})
+    assert missing.status_code == 401 and "GEMINI_API_KEY" in missing.text
 
 
 def test_tool_round_trip_keeps_signature_and_name():

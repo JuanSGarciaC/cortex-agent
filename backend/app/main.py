@@ -3,7 +3,7 @@ import json
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
@@ -22,7 +22,14 @@ async def lifespan(_app):
     warmup.cancel()
 
 
-app = FastAPI(title="Cortex Agent", lifespan=lifespan)
+def reject_foreign_origin(request: Request) -> None:
+    # CORS only hides responses from other sites; without this, any web page could still upload documents here.
+    origin = request.headers.get("origin")
+    if origin and origin not in config.CORS_ORIGINS:
+        raise HTTPException(403, "Origen no permitido")
+
+
+app = FastAPI(title="Cortex Agent", lifespan=lifespan, dependencies=[Depends(reject_foreign_origin)])
 app.add_middleware(CORSMiddleware, allow_origins=config.CORS_ORIGINS, allow_methods=["*"], allow_headers=["*"])
 
 
@@ -106,6 +113,8 @@ def delete_conversation(conv_id: int):
     with db.session() as conn:
         if not conn.execute("DELETE FROM conversations WHERE id=?", (conv_id,)).rowcount:
             raise HTTPException(404, "La conversación no existe")
+        conn.execute("DELETE FROM events WHERE run_id IN (SELECT id FROM runs WHERE conv_id=?)", (conv_id,))
+        conn.execute("DELETE FROM runs WHERE conv_id=?", (conv_id,))
     return {"ok": True}
 
 
