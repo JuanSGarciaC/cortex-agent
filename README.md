@@ -147,6 +147,10 @@ Son 21 tests. Usan un cliente LLM falso con respuestas guionadas y embeddings de
 - **Los servidores MCP externos se abren en cada run.** Es simple y aísla fallos, pero agrega latencia si son lentos al arrancar.
 - **Sin autenticación.** Es una app local de un solo usuario; no la expongas a internet tal cual.
 
+## Licencia
+
+[MIT](LICENSE), salvo `frontend/src/components/SwarmCursor.tsx` y `SwarmCursor.css`, que vienen de React Bits y mantienen su propia licencia (MIT + Commons Clause): ver [`SwarmCursor.LICENSE.md`](frontend/src/components/SwarmCursor.LICENSE.md). Esos archivos no pueden venderse ni redistribuirse por sí solos.
+
 ## Créditos
 
 - Swarm Cursor de [React Bits](https://reactbits.dev/animations/swarm-cursor), en `frontend/src/components/SwarmCursor.tsx`.

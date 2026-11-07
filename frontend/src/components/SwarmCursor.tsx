@@ -1,3 +1,4 @@
+// From React Bits (https://reactbits.dev). Not under this repo's MIT license: see SwarmCursor.LICENSE.md.
 'use client';
 
 import { useEffect, useRef, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react';
