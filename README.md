@@ -150,7 +150,7 @@ Son 26 tests. Usan un cliente LLM falso con respuestas guionadas y embeddings de
 
 ## Licencia
 
-[MIT](LICENSE), salvo `frontend/src/components/SwarmCursor.tsx` y `SwarmCursor.css`, que vienen de React Bits y mantienen su propia licencia (MIT + Commons Clause): ver [`SwarmCursor.LICENSE.md`](frontend/src/components/SwarmCursor.LICENSE.md). Esos archivos no pueden venderse ni redistribuirse por sí solos.
+Todos los derechos reservados. El código se publica para consulta como parte de mi portafolio: puedes leerlo, pero no usarlo, copiarlo, modificarlo ni distribuirlo sin mi autorización por escrito. Ver [LICENSE](LICENSE). La excepción son `frontend/src/components/SwarmCursor.tsx` y `SwarmCursor.css`, que vienen de React Bits y mantienen su propia licencia (MIT + Commons Clause): ver [`SwarmCursor.LICENSE.md`](frontend/src/components/SwarmCursor.LICENSE.md). Esos archivos no pueden venderse ni redistribuirse por sí solos.
 
 ## Créditos
 
