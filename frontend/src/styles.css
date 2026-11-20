@@ -146,6 +146,23 @@ code, pre, .mono { font-family: var(--mono); }
 .module p { color: var(--muted); margin: 6px 0 0; font-size: 13px; }
 .module .tag { position: absolute; top: 12px; left: 12px; z-index: 1; }
 
+/* Home effects (components/HomeFx.tsx). Only transform and opacity are animated. */
+.split .word { display: inline-block; white-space: pre; animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.tnum { font-variant-numeric: tabular-nums; }
+.pending .reveal-item { opacity: 0; }
+/* `backwards`, not `both`: once finished the animation lets go of transform so the hover lift still works. */
+.revealed .reveal-item { animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+.trace-demo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 16px; align-items: start; }
+.td-chat { display: flex; flex-direction: column; gap: 16px; padding: 22px; }
+.td-chat .msg { animation: none; }
+.td-answer { margin: 0; line-height: 1.6; }
+.td-answer .ghost { visibility: hidden; }
+.td-answer .caret { display: inline-block; width: 7px; height: 1em; margin-left: 1px; vertical-align: -2px; background: var(--accent); animation: blink 1s infinite; }
+.td-replay { align-self: flex-start; }
+.td-trace { min-height: 420px; }
+.td-label { font-size: 11px; color: var(--muted); margin-bottom: 14px; letter-spacing: 0.04em; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
 /* ---------- Chat ---------- */
 .chat { display: grid; grid-template-columns: 240px minmax(0, 1fr) 380px; height: 100vh; }
 .chat-list { border-right: 1px solid var(--line); padding: 18px 12px; overflow: auto; }
@@ -297,6 +314,8 @@ code, pre, .mono { font-family: var(--mono); }
   .chat .empty { grid-template-columns: minmax(0, 1fr); }
   .chat { grid-template-columns: 1fr; height: calc(100vh - 62px); }
   .chat-list { display: none; }
+  .trace-demo { grid-template-columns: 1fr; }
+  .td-trace { min-height: 0; }
   .traces, .catalog { grid-template-columns: 1fr; }
   .filters { position: static; flex-direction: row; flex-wrap: wrap; }
   .filters h4 { display: none; }
