@@ -121,7 +121,11 @@ export function TraceDemo() {
       </div>
       <div className="td-trace card" aria-live="off">
         <div className="mono dim td-label">traza simulada · 2 pasos · 1 llamada MCP</div>
-        <Timeline events={EVENTS.slice(0, shown)} />
+        {/* The invisible full copy reserves the final height so the page below doesn't shift as steps appear. */}
+        <div className="td-stack">
+          <div aria-hidden className="ghost"><Timeline events={EVENTS} /></div>
+          <Timeline events={EVENTS.slice(0, shown)} />
+        </div>
       </div>
     </div>
   );
