@@ -4,7 +4,7 @@ import { Activity, ArrowUp, KeyRound, MessageSquare, Plus, Sparkles, Trash2 } fr
 import Timeline from '../components/Timeline';
 import { api, fmtUsd, streamChat, type TraceEvent } from '../lib/api';
 
-type Turn = { run_id?: number; question: string; answer: string; status: string };
+type Turn = { run_id?: number; question: string; answer: string; status: string; typing?: boolean };
 
 const SUGGESTIONS = [
   '¿Cuántos días de vacaciones tengo si llevo 7 años?',
@@ -16,16 +16,49 @@ const SUGGESTIONS = [
 // [12] or [chunk_id:12] in an answer is a chunk citation: render it as a chip.
 const withCitations = (text: string) => text.replace(/\[(?:chunk_id[:=\s]*)?(\d{1,6})\]/g, '[$1](#chunk-$1)');
 
-function Answer({ text }: { text: string }) {
+const REDUCED = typeof window !== 'undefined' && (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
+const TYPE_MAX_MS = 1200; // B2: the whole answer is typed in at most this long, so reading is never held up
+
+/** Reveal `text` word by word (B2). A click or any key shows it all; reduced motion shows it at once. */
+function useTyped(text: string, on: boolean, onDone?: () => void) {
+  const [n, setN] = useState(on && !REDUCED ? 0 : text.length);
+  const doneRef = useRef(onDone);
+  doneRef.current = onDone;
+  useEffect(() => {
+    if (!on || REDUCED) { setN(text.length); return; }
+    const rate = Math.max(text.length / TYPE_MAX_MS, 0.09); // chars per ms
+    let raf = 0;
+    let start = 0;
+    let lastN = -1;
+    const finish = () => { cancelAnimationFrame(raf); setN(text.length); off(); doneRef.current?.(); };
+    const off = () => { window.removeEventListener('keydown', finish); window.removeEventListener('pointerdown', finish); };
+    const tick = (t: number) => {
+      start ||= t;
+      let k = Math.min(text.length, Math.round((t - start) * rate));
+      if (k < text.length) { const sp = text.indexOf(' ', k); k = sp === -1 ? text.length : sp; } // whole words only
+      if (k !== lastN) { lastN = k; setN(k); }
+      if (k >= text.length) { off(); doneRef.current?.(); } else raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    window.addEventListener('keydown', finish);
+    window.addEventListener('pointerdown', finish);
+    return () => { cancelAnimationFrame(raf); off(); };
+  }, [text, on]);
+  return n >= text.length ? text : text.slice(0, n);
+}
+
+function Answer({ text, typing = false, onTyped }: { text: string; typing?: boolean; onTyped?: () => void }) {
+  const shown = useTyped(text, typing, onTyped);
+  const busy = shown.length < text.length;
   return (
-    <div className="md">
+    <div className={`md ${busy ? 'typing' : ''}`} aria-busy={busy}>
       <ReactMarkdown
         components={{
           a: ({ href, children }) =>
             href?.startsWith('#chunk-') ? <span className="cite" title={`Fragmento ${href.slice(7)}`}>{children}</span> : <a href={href} target="_blank" rel="noreferrer" style={{ color: 'var(--cyan)' }}>{children}</a>,
         }}
       >
-        {withCitations(text)}
+        {withCitations(shown)}
       </ReactMarkdown>
     </div>
   );
@@ -90,7 +123,7 @@ export default function Chat() {
         if (e.type === 'answer' || (e.type === 'error' && e.data.where === 'harness')) {
           const answer = e.type === 'answer' ? e.data.text : e.data.message;
           const status = e.type === 'answer' ? e.data.status : 'error';
-          setTurns((t) => t.map((turn, i) => (i === t.length - 1 ? { ...turn, answer, status, run_id: e.run_id } : turn)));
+          setTurns((t) => t.map((turn, i) => (i === t.length - 1 ? { ...turn, answer, status, run_id: e.run_id, typing: true } : turn)));
         }
       });
     } catch (err) {
@@ -149,7 +182,7 @@ export default function Chat() {
                 ) : t.status === 'error' ? (
                   <div className="error-box">{t.answer}</div>
                 ) : (
-                  <Answer text={t.answer} />
+                  <Answer text={t.answer} typing={t.typing} onTyped={() => endRef.current?.scrollIntoView({ behavior: 'smooth' })} />
                 )}
               </div>
             </div>

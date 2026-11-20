@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Brain, Database, FlaskConical, GitBranch, MessageSquare, Wrench } from 'lucide-react';
-import SwarmCursor from '../components/SwarmCursor';
-import '../components/SwarmCursor.css';
+import { ArrowRight, Brain, Database, FlaskConical, GitBranch, MessageSquare, RotateCcw, Wrench } from 'lucide-react';
 import { api, fmtUsd, type Stats } from '../lib/api';
+import { startSwarmRebuild } from '../lib/swarmRebuild';
+import '../lib/swarmRebuild.css';
 
 const MODULES = [
   { to: '/chat', icon: MessageSquare, title: 'Harness propio', text: 'Bucle del agente sobre la Messages API: límites de pasos y costo, herramientas en paralelo, trazas por paso.', tag: 'Agente', cover: 'loop' },
@@ -65,13 +65,24 @@ function Cover({ kind }: { kind: string }) {
 
 export default function Home() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     api.stats().then(setStats).catch(() => setStats(null));
   }, []);
 
+  // Swarm Rebuild: plays once per session; the replay button restarts it. Layout effect so layers hide before paint.
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    const scroller = root?.closest<HTMLElement>('.main');
+    if (!root || !scroller) return;
+    const swarm = startSwarmRebuild(root, scroller);
+    return () => swarm?.destroy();
+  }, []);
+
   return (
-    <>
-      <SwarmCursor className="hero" count={1400} color="#c8ff3d" accentColor="#5ee6ff" idle="roam" spread={230}>
+    <div ref={rootRef}>
+      <div className="hero">
+        <div className="hero-bg" aria-hidden><div className="hero-dots" /></div>
         <div className="hero-inner">
           <h1>
             Un agente que puedes <span className="glow">ver pensar.</span>
@@ -84,24 +95,27 @@ export default function Home() {
         </div>
         {stats && (
           <div className="hero-stats">
-            <span><b>{stats.documents}</b>documentos</span>
-            <span><b>{stats.chunks}</b>fragmentos</span>
-            <span><b>{stats.memories}</b>memorias</span>
-            <span><b>{stats.runs}</b>runs</span>
-            <span><b>{stats.tool_calls}</b>llamadas MCP</span>
-            <span><b>{fmtUsd(stats.cost_usd)}</b>costo total</span>
+            <span data-sr-layer><b>{stats.documents}</b>documentos</span>
+            <span data-sr-layer><b>{stats.chunks}</b>fragmentos</span>
+            <span data-sr-layer><b>{stats.memories}</b>memorias</span>
+            <span data-sr-layer><b>{stats.runs}</b>runs</span>
+            <span data-sr-layer><b>{stats.tool_calls}</b>llamadas MCP</span>
+            <span data-sr-layer><b>{fmtUsd(stats.cost_usd)}</b>costo total</span>
           </div>
         )}
-      </SwarmCursor>
+      </div>
       <section className="page" style={{ paddingTop: 48 }}>
         <div className="page-head">
           <div>
             <h1>Seis piezas, un mismo registro de eventos</h1>
           </div>
+          <button type="button" className="btn ghost" data-sr-replay data-sr-skip>
+            <RotateCcw size={15} /> Reconstruir
+          </button>
         </div>
         <div className="modules">
           {MODULES.map(({ to, icon: Icon, title, text, tag, cover }) => (
-            <Link to={to} className="module" key={to}>
+            <Link to={to} className="module" key={to} data-sr-box>
               <span className="chip accent tag">{tag}</span>
               <div className="cover"><Cover kind={cover} /></div>
               <div className="body">
@@ -112,6 +126,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-    </>
+    </div>
   );
 }

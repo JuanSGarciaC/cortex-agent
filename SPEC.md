@@ -30,9 +30,9 @@ Una sola app que reúne un **harness de agente propio**, **MCP** (servidor y cli
 
 ## Frontend (React, Vite, TypeScript)
 Tema oscuro, íconos `lucide-react`, sin emojis.
-- **Inicio**: hero con Swarm Cursor (React Bits).
-- **Chat**: conversación más un panel de traza en vivo.
-- **Trazas**: grafo animado del bucle por run.
+- **Inicio**: Swarm Rebuild (un enjambre de cursores construye la página una vez por sesión; `src/lib/swarmRebuild.ts`), sobre un hero con dot grid y glow en CSS.
+- **Chat**: conversación más un panel de traza en vivo; la respuesta del turno en vivo se teclea en hasta 1,2 s.
+- **Trazas**: grafo del bucle por run, con paquetes de datos que recorren las aristas en el orden de los pasos.
 - **Mapa RAG**: nube 2D de chunks; la consulta se ilumina junto a sus vecinos.
 - **Memoria**: grafo de fuerzas (canvas) de hechos agrupados por tipo.
 - **Evals**: mapa de calor de casos × corridas y KPIs.

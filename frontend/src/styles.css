@@ -126,6 +126,17 @@ code, pre, .mono { font-family: var(--mono); }
 
 /* ---------- Home ---------- */
 .hero { position: relative; height: 100vh; min-height: 620px; overflow: hidden; }
+/* E3 dot grid + E8 glow: static CSS gradients, no filters and no extra compositing layers (cheap even without a GPU). */
+.hero-bg {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(48vw 38vw at 88% 4%, rgba(200, 255, 61, 0.13), rgba(200, 255, 61, 0.04) 50%, transparent 72%),
+    radial-gradient(42vw 34vw at 22% 104%, rgba(94, 230, 255, 0.11), rgba(94, 230, 255, 0.035) 50%, transparent 72%);
+}
+.hero-dots {
+  position: absolute; inset: 0; background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1.3px); background-size: 26px 26px;
+  mask-image: radial-gradient(ellipse 75% 70% at 62% 45%, #000 30%, transparent 78%);
+}
 .hero-inner { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 0 8vw; pointer-events: none; }
 .hero-inner > * { pointer-events: auto; }
 .hero h1 { font-size: clamp(48px, 8vw, 112px); line-height: 0.95; font-weight: 700; max-width: 900px; }
@@ -162,6 +173,7 @@ code, pre, .mono { font-family: var(--mono); }
 .msg.bot .md p { margin: 0 0 10px; }
 .msg.bot .md ul, .msg.bot .md ol { margin: 0 0 10px; padding-left: 20px; }
 .msg.bot .md code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; font-size: 12.5px; }
+.msg.bot .md.typing > :is(p, h1, h2, h3, h4, blockquote):last-child::after, .msg.bot .md.typing > :is(ul, ol):last-child > li:last-child::after { content: ''; display: inline-block; width: 7px; height: 1.05em; margin-left: 2px; vertical-align: -2px; background: var(--accent); animation: blink 1s infinite; }
 .cite { display: inline-flex; padding: 0 6px; margin: 0 1px; border-radius: 6px; font-family: var(--mono); font-size: 11px; color: var(--cyan); background: rgba(94, 230, 255, 0.1); vertical-align: 1px; }
 .composer { padding: 14px 8% 22px; }
 .composer form { display: flex; gap: 10px; align-items: flex-end; padding: 8px; border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
@@ -292,7 +304,6 @@ code, pre, .mono { font-family: var(--mono); }
   .rail .logo, .rail .spacer, .rail a .tip { display: none; }
   .rail a { flex: 1 1 0; min-width: 0; max-width: 48px; }
   .status-dot { flex: none; }
-  .hero .swarm-cursor-canvas { opacity: 0.45; }
   .suggestions .chip { white-space: normal; max-width: 100%; }
   .chat .empty { grid-template-columns: minmax(0, 1fr); }
   .chat { grid-template-columns: 1fr; height: calc(100vh - 62px); }

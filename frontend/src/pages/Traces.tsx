@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Background, Handle, Position, ReactFlow, type Edge, type Node, type NodeProps } from '@xyflow/react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Background, BaseEdge, getBezierPath, Handle, Position, ReactFlow, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react';
 import { GitBranch } from 'lucide-react';
 import { EVENT_META } from '../components/Timeline';
 import { api, fmtDate, fmtMs, fmtUsd, type Run, type TraceEvent } from '../lib/api';
@@ -19,6 +19,31 @@ function StepNode({ data }: NodeProps<Node<StepData>>) {
   );
 }
 const nodeTypes = { step: StepNode };
+
+// H5: one data packet per edge. All edges share a period, and each packet only moves inside its own slot,
+// so a wave runs through the graph in the order of the steps.
+type FlowData = { color: string; slot: number; slots: number };
+const SLOT = 0.55; // seconds per column
+const REDUCED = typeof window !== 'undefined' && (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
+
+function FlowEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style, data }: EdgeProps<Edge<FlowData>>) {
+  const [path] = getBezierPath({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition });
+  if (REDUCED || !data) return <BaseEdge id={id} path={path} style={style} />;
+  const period = data.slots * SLOT + 0.8;
+  const a = (data.slot * SLOT) / period;
+  const b = Math.min(0.999, a + (SLOT * 1.6) / period);
+  const f = (n: number) => n.toFixed(4);
+  return (
+    <>
+      <BaseEdge id={id} path={path} style={style} />
+      <circle r={3.5} fill={data.color} opacity={0} style={{ filter: `drop-shadow(0 0 5px ${data.color})` }}>
+        <animateMotion dur={`${period}s`} repeatCount="indefinite" path={path} keyPoints="0;0;1;1" keyTimes={`0;${f(a)};${f(b)};1`} calcMode="linear" />
+        <animate attributeName="opacity" dur={`${period}s`} repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes={`0;${f(a)};${f(a + 0.01)};${f(b - 0.01)};${f(b)};1`} />
+      </circle>
+    </>
+  );
+}
+const edgeTypes = { flow: FlowEdge };
 
 // Wrapping keeps fitView near 100 % zoom: one long row shrank the nodes until they were unreadable.
 const COLS_PER_ROW = 4;
@@ -47,7 +72,10 @@ function buildGraph(events: TraceEvent[], selected: number | null) {
         data: { title: e.type === 'tool_call' ? d.name : e.type === 'llm_call' ? `Modelo · paso ${d.step}` : EVENT_META[e.type]?.label ?? e.type, sub, type: e.type, event: res ?? e, err: e.type === 'error' || !!res?.data.is_error, selected: selected === e.seq },
       });
     });
-    prev.forEach((p) => ids.forEach((id) => edges.push({ id: `${p}-${id}`, source: p, target: id, animated: true, style: { stroke: '#c8ff3d88', strokeWidth: 1.5 } })));
+    prev.forEach((p) => group.forEach((e, k) => edges.push({
+      id: `${p}-${ids[k]}`, source: p, target: ids[k], type: 'flow', style: { stroke: '#c8ff3d55', strokeWidth: 1.5 },
+      data: { color: EVENT_META[e.type]?.color ?? '#c8ff3d', slot: col - 1, slots: 0 },
+    })));
     prev = ids;
     col += 1;
   };
@@ -61,6 +89,7 @@ function buildGraph(events: TraceEvent[], selected: number | null) {
       add(group);
     } else add([shown[i++]]);
   }
+  edges.forEach((e) => { if (e.data) e.data.slots = Math.max(1, col - 1); });
   return { nodes, edges };
 }
 
@@ -105,6 +134,19 @@ export default function Traces() {
   }, [active]);
 
   const graph = useMemo(() => buildGraph(events, selected?.seq ?? null), [events, selected]);
+  const flowRef = useRef<HTMLDivElement>(null);
+
+  // Pause the packets (SMIL) while the graph is off screen or the tab is hidden.
+  useEffect(() => {
+    const box = flowRef.current;
+    if (!box || REDUCED) return;
+    let visible = true;
+    const apply = () => box.querySelectorAll('svg').forEach((svg) => (visible && !document.hidden ? svg.unpauseAnimations() : svg.pauseAnimations()));
+    const io = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; apply(); });
+    io.observe(box);
+    document.addEventListener('visibilitychange', apply);
+    return () => { io.disconnect(); document.removeEventListener('visibilitychange', apply); };
+  }, [runs.length]);
   const run = runs.find((r) => r.id === active);
   const thinking = events.filter((e) => e.type === 'thinking');
 
@@ -144,9 +186,9 @@ export default function Traces() {
             )}
             <div className="card">
               <div className="card-title"><h3>Grafo del run</h3><span className="dim mono" style={{ fontSize: 11 }}>{run && fmtDate(run.started_at)}</span></div>
-              <div className="flow">
+              <div className="flow" ref={flowRef}>
                 <ReactFlow
-                  key={active ?? 0} nodes={graph.nodes} edges={graph.edges} nodeTypes={nodeTypes} fitView colorMode="dark"
+                  key={active ?? 0} nodes={graph.nodes} edges={graph.edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} fitView colorMode="dark"
                   nodesDraggable={false} proOptions={{ hideAttribution: true }}
                   onNodeClick={(_, n) => setSelected((n.data as StepData).event)}
                 >

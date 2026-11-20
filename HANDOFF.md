@@ -32,7 +32,8 @@ Nada obligatorio. Opcional: autenticación si se expone fuera de localhost; miti
 - Modelos en uso: agente `gemini-3.6-flash`; juez y extracción de memoria con `gemini-3.5-flash-lite`, por el traductor. Se cambian en `backend/.env`. Los valores por defecto del código son modelos de Claude, sin probar.
 - El endpoint de Ollama ignora `output_format`, así que el juez y la memoria también envían el JSON Schema en el prompt (`llm.structured`).
 - Versiones instaladas: `mcp` 2.3 (`MCPServer` y `Client`; FastMCP ya no existe) y `anthropic` 2.5.
-- Swarm Cursor (WebGL) se ve en blanco bajo `React.StrictMode`; por eso `main.tsx` no lo usa.
+- Swarm Cursor (WebGL) se ve en blanco bajo `React.StrictMode`; por eso `main.tsx` no lo usa. Desde 2026-11-20 el hero ya no lo usa (lo reemplaza Swarm Rebuild, sin dependencias), pero los archivos siguen porque el README los cita.
+- Efectos: Swarm Rebuild en Inicio (una vez por sesión, botón «Reconstruir»), paquetes en las aristas de Trazas y typewriter en el chat. Con `prefers-reduced-motion` no se anima nada.
 - La búsqueda vectorial es por fuerza bruta en numpy y el mapa usa PCA en lugar de UMAP. Los límites están anotados con comentarios `shortcut:`.
 - Con `qwen3:4b`, `thinking: disabled` no funciona: el modelo razona igual y lo mezcla con la respuesta. Por eso sigue activo.
 - En el chat, la memoria se extrae en segundo plano después de `run_end`. El evento `memory_write` aparece en Trazas, no en la traza en vivo.
