@@ -83,12 +83,17 @@ export default function Home() {
         </div>
         {stats && (
           <div className="hero-stats">
-            <span><CountUp value={stats.documents} />documentos</span>
-            <span><CountUp value={stats.chunks} />fragmentos</span>
-            <span><CountUp value={stats.memories} />memorias</span>
-            <span><CountUp value={stats.runs} />runs</span>
-            <span><CountUp value={stats.tool_calls} />llamadas MCP</span>
-            <span><CountUp value={stats.cost_usd} format={fmtUsd} />costo total</span>
+            {/* Zero metrics are hidden: a count-up that ends at 0 says nothing on a fresh install. */}
+            {([
+              [stats.documents, 'documentos'],
+              [stats.chunks, 'fragmentos'],
+              [stats.memories, 'memorias'],
+              [stats.runs, 'runs'],
+              [stats.tool_calls, 'llamadas MCP'],
+              [stats.cost_usd, 'costo total', fmtUsd],
+            ] as [number, string, ((n: number) => string)?][]).filter(([v]) => v > 0).map(([v, label, fmt]) => (
+              <span key={label}><CountUp value={v} format={fmt} />{label}</span>
+            ))}
           </div>
         )}
       </SwarmCursor>

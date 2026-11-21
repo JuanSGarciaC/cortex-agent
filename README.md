@@ -34,7 +34,7 @@ flowchart LR
 
 | | |
 |---|---|
-| ![Inicio](docs/img/inicio.png) **Inicio**: el enjambre de partículas sigue al cursor detrás del titular, y las cifras salen de la base real. | ![Así piensa un turno](docs/img/inicio-traza.png) **Así piensa un turno**: una traza simulada con el mismo componente de Trazas; los pasos aparecen uno a uno y la respuesta se teclea. |
+| ![Inicio](docs/img/inicio.png) **Inicio**: el enjambre de partículas sigue al cursor detrás del titular, y las cifras salen de la base real (las que valen 0 se ocultan). | ![Así piensa un turno](docs/img/inicio-traza.png) **Así piensa un turno**: una traza simulada con el mismo componente de Trazas; los pasos aparecen uno a uno y la respuesta se teclea. |
 | ![Mapa RAG](docs/img/rag.png) **Mapa RAG**: cada fragmento proyectado en 2D; la consulta cae en el mapa y se iluminan los vecinos recuperados, con su puesto en la búsqueda vectorial y en BM25. | ![Memoria](docs/img/memoria.png) **Memoria**: grafo de fuerzas agrupado por tipo de hecho, con aristas entre hechos de significado parecido. |
 | ![Evals](docs/img/evals.png) **Evals**: mapa de calor de casos × corridas; al hacer clic en una celda se ven las métricas y la salida. | ![Herramientas](docs/img/herramientas.png) **Herramientas MCP**: catálogo con filtros por origen y servidor, parámetros del schema y uso real. |
 
