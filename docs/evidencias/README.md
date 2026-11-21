@@ -1,5 +1,21 @@
 # Evidencias de prueba
 
+## Rediseño de la vista Inicio (2026-11-21)
+
+Revisión con Playwright y Edge sin interfaz, sobre los datos de ejemplo de `seed.py`:
+
+| Comprobación | Resultado |
+|---|---|
+| Errores de consola (escritorio 1440 px, móvil 390 px, `prefers-reduced-motion`, sin JS) | 0 en los cuatro casos |
+| Scroll horizontal | 0 px en 1440 y en 390 |
+| Traza "Así piensa un turno" | 7 pasos y respuesta completa; la sección siguiente no se mueve mientras se llena (672 px de distancia antes y después) |
+| `prefers-reduced-motion` | Pasos, respuesta y tarjetas visibles desde la carga |
+| Sin JavaScript | Aviso con una descripción breve, sobre fondo oscuro |
+| Tests del backend | 26 en verde (`tests.txt`) |
+| Build del frontend | `npm run build` en verde |
+
+Capturas: `docs/img/inicio.png`, `docs/img/inicio-traza.png` y `docs/img/inicio-demo.gif` (17,6 s a ritmo real).
+
 ## Prueba con Gemini y traductor en el repo (2026-11-06)
 
 Base de datos temporal recién cargada con `seed.py`, a través de `backend/app/gemini_proxy.py`. Agente con `gemini-3.6-flash`; juez y memoria con `gemini-3.5-flash-lite`.
