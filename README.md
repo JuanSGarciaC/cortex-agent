@@ -2,7 +2,7 @@
 
 Una sola app que reúne un **harness de agente propio**, **MCP** (servidor y cliente), **RAG híbrido**, **memoria de largo plazo** y **evals**, con vistas de observabilidad para ver qué hace el agente en cada paso.
 
-![Inicio](docs/img/inicio.png)
+![Vista Inicio: el titular entra palabra a palabra, las cifras cuentan, el enjambre sigue al cursor y una traza simulada se llena paso a paso](docs/img/inicio-demo.gif)
 
 ## Qué hay adentro
 
@@ -34,6 +34,7 @@ flowchart LR
 
 | | |
 |---|---|
+| ![Inicio](docs/img/inicio.png) **Inicio**: el enjambre de partículas sigue al cursor detrás del titular, y las cifras salen de la base real (las que valen 0 se ocultan). | ![Así piensa un turno](docs/img/inicio-traza.png) **Así piensa un turno**: una traza simulada con el mismo componente de Trazas; los pasos aparecen uno a uno y la respuesta se teclea. |
 | ![Mapa RAG](docs/img/rag.png) **Mapa RAG**: cada fragmento proyectado en 2D; la consulta cae en el mapa y se iluminan los vecinos recuperados, con su puesto en la búsqueda vectorial y en BM25. | ![Memoria](docs/img/memoria.png) **Memoria**: grafo de fuerzas agrupado por tipo de hecho, con aristas entre hechos de significado parecido. |
 | ![Evals](docs/img/evals.png) **Evals**: mapa de calor de casos × corridas; al hacer clic en una celda se ven las métricas y la salida. | ![Herramientas](docs/img/herramientas.png) **Herramientas MCP**: catálogo con filtros por origen y servidor, parámetros del schema y uso real. |
 
@@ -42,6 +43,20 @@ También están el **Chat**, con una traza en vivo al lado de la respuesta, y **
 | | |
 |---|---|
 | ![Chat](docs/img/chat.png) **Chat** | ![Trazas](docs/img/trazas.png) **Trazas** |
+
+### Efectos de la vista Inicio
+
+Las demás vistas son herramientas de trabajo y no llevan efectos de entrada. Solo la portada los tiene, y hay un único efecto protagonista: el enjambre.
+
+| Dónde | Técnica | Cómo |
+|---|---|---|
+| Fondo del hero | Enjambre de partículas en WebGL que sigue al cursor | `SwarmCursor.tsx` (React Bits) |
+| Titular | Entrada palabra a palabra | `SplitText` en `frontend/src/components/HomeFx.tsx` |
+| Cifras del hero | Contador hasta el valor real de `/api/stats` | `CountUp` |
+| "Así piensa un turno" | Los pasos de la traza aparecen uno tras otro y la respuesta se teclea sin mover el diseño | `TraceDemo`, que reutiliza `Timeline` |
+| Tarjetas de módulos | Aparición escalonada al hacer scroll | `Reveal` + `IntersectionObserver` |
+
+Sin librerías de animación: solo se animan `transform` y `opacity`. Con `prefers-reduced-motion` todo aparece completo y quieto; sin JavaScript, `index.html` muestra una descripción breve en lugar de una página en blanco. La traza de la portada es una simulación: la respuesta es la de una corrida real con Gemini (`docs/evidencias/latencia-chat-gemini.txt`), pero los tokens y los tiempos por paso son ilustrativos.
 
 ## Con qué se probó
 
@@ -136,7 +151,9 @@ El comando sale con código 1 si la tasa de aprobados queda bajo `--min-pass`. E
 cd backend && python -m pytest -q
 ```
 
-Son 26 tests. Usan un cliente LLM falso con respuestas guionadas y embeddings deterministas, así que no gastan API ni descargan modelos. Cubren el bucle del harness (herramientas, límite de pasos, rechazo, falta de credenciales), MCP en proceso, la búsqueda híbrida, la memoria, los evals (incluido el juez), la API con SSE y el traductor de Gemini.
+Son 26 tests (salida en [`docs/evidencias/tests.txt`](docs/evidencias/tests.txt)). Usan un cliente LLM falso con respuestas guionadas y embeddings deterministas, así que no gastan API ni descargan modelos. Cubren el bucle del harness (herramientas, límite de pasos, rechazo, falta de credenciales), MCP en proceso, la búsqueda híbrida, la memoria, los evals (incluido el juez), la API con SSE y el traductor de Gemini.
+
+El frontend no tiene tests unitarios; la CI comprueba que compile (`cd frontend && npm ci && npm run build`, con TypeScript estricto). La vista Inicio se revisó en Edge sin interfaz a 1440 px y a 390 px, con `prefers-reduced-motion` y sin JavaScript: sin errores de consola ni scroll horizontal. Para verla tú, abre http://localhost:5173 y baja hasta la traza; para comprobar el modo sin animaciones, activa "Efectos de animación: desactivado" en Windows (o `prefers-reduced-motion` en las DevTools).
 
 ## Decisiones y límites conocidos
 

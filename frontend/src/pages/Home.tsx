@@ -4,6 +4,7 @@ import { ArrowRight, Brain, Database, FlaskConical, GitBranch, MessageSquare, Wr
 import SwarmCursor from '../components/SwarmCursor';
 import '../components/SwarmCursor.css';
 import { api, fmtUsd, type Stats } from '../lib/api';
+import { CountUp, Reveal, SplitText, TraceDemo } from '../components/HomeFx';
 
 const MODULES = [
   { to: '/chat', icon: MessageSquare, title: 'Harness propio', text: 'Bucle del agente sobre la Messages API: límites de pasos y costo, herramientas en paralelo, trazas por paso.', tag: 'Agente', cover: 'loop' },
@@ -73,9 +74,7 @@ export default function Home() {
     <>
       <SwarmCursor className="hero" count={1400} color="#c8ff3d" accentColor="#5ee6ff" idle="roam" spread={230}>
         <div className="hero-inner">
-          <h1>
-            Un agente que puedes <span className="glow">ver pensar.</span>
-          </h1>
+          <SplitText parts={[{ text: 'Un agente que puedes' }, { text: 'ver pensar.', className: 'glow' }]} />
           <p className="lead">Cortex une un bucle de agente propio, herramientas MCP, búsqueda híbrida, memoria de largo plazo y evals en una sola app, y deja cada paso a la vista.</p>
           <div className="ctas">
             <Link to="/chat" className="btn primary">Abrir el chat <ArrowRight size={16} /></Link>
@@ -84,24 +83,36 @@ export default function Home() {
         </div>
         {stats && (
           <div className="hero-stats">
-            <span><b>{stats.documents}</b>documentos</span>
-            <span><b>{stats.chunks}</b>fragmentos</span>
-            <span><b>{stats.memories}</b>memorias</span>
-            <span><b>{stats.runs}</b>runs</span>
-            <span><b>{stats.tool_calls}</b>llamadas MCP</span>
-            <span><b>{fmtUsd(stats.cost_usd)}</b>costo total</span>
+            {/* Zero metrics are hidden: a count-up that ends at 0 says nothing on a fresh install. */}
+            {([
+              [stats.documents, 'documentos'],
+              [stats.chunks, 'fragmentos'],
+              [stats.memories, 'memorias'],
+              [stats.runs, 'runs'],
+              [stats.tool_calls, 'llamadas MCP'],
+              [stats.cost_usd, 'costo total', fmtUsd],
+            ] as [number, string, ((n: number) => string)?][]).filter(([v]) => v > 0).map(([v, label, fmt]) => (
+              <span key={label}><CountUp value={v} format={fmt} />{label}</span>
+            ))}
           </div>
         )}
       </SwarmCursor>
       <section className="page" style={{ paddingTop: 48 }}>
         <div className="page-head">
           <div>
+            <h1>Así piensa un turno</h1>
+            <p>Cada paso del agente queda como un evento: memoria, llamadas al modelo, herramientas MCP y respuesta con cita. Esta es una simulación de una corrida real.</p>
+          </div>
+        </div>
+        <TraceDemo />
+        <div className="page-head" style={{ marginTop: 56 }}>
+          <div>
             <h1>Seis piezas, un mismo registro de eventos</h1>
           </div>
         </div>
-        <div className="modules">
-          {MODULES.map(({ to, icon: Icon, title, text, tag, cover }) => (
-            <Link to={to} className="module" key={to}>
+        <Reveal className="modules">
+          {MODULES.map(({ to, icon: Icon, title, text, tag, cover }, i) => (
+            <Link to={to} className="module reveal-item" key={to} style={{ animationDelay: `${i * 0.07}s` }}>
               <span className="chip accent tag">{tag}</span>
               <div className="cover"><Cover kind={cover} /></div>
               <div className="body">
@@ -110,7 +121,7 @@ export default function Home() {
               </div>
             </Link>
           ))}
-        </div>
+        </Reveal>
       </section>
     </>
   );
